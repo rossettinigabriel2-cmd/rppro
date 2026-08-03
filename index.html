@@ -1,495 +1,612 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark h-full">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RP Prospect - Prospecção Inteligente B2B</title>
+  <title>RP Prospect - Prospecção B2B com IA & Google Maps</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
-            surface: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
-          }
-        }
-      }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
     }
-  </script>
+  </style>
 </head>
-<body class="bg-surface-950 text-slate-100 font-sans h-full antialiased selection:bg-brand-600 selection:text-white">
-  <div id="app" class="h-full flex flex-col">
-    <!-- Login Screen -->
-    <div id="screen-login" class="flex-1 flex items-center justify-center p-4">
-      <div class="w-full max-w-md bg-surface-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
-        <div class="text-center space-y-2">
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600/20 text-brand-500 mb-2">
-            <i class="fa-solid fa-chart-line text-2xl"></i>
-          </div>
-          <h1 class="text-2xl font-bold tracking-tight text-white">RP Prospect</h1>
-          <p class="text-xs text-slate-400">Motor de Busca & Copiloto IA B2B</p>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row">
+
+  <!-- TELAS DO SISTEMA -->
+  
+  <!-- 1. TELA DE LOGIN -->
+  <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl mb-2">
+          RP
         </div>
-        <form onsubmit="app.login(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">E-mail</label>
-            <input type="email" id="login-email" value="admin@rpprospect.com" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 text-white" required>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Senha</label>
-            <input type="password" id="login-pass" value="123456" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 text-white" required>
-          </div>
-          <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200 cursor-pointer">
-            Entrar no Sistema
-          </button>
-        </form>
+        <h2 class="text-2xl font-bold text-white">Acessar RP Prospect</h2>
+        <p class="text-slate-400 text-sm">Plataforma Inteligente de Prospecção B2B</p>
       </div>
+
+      <form id="loginForm" class="space-y-4" onsubmit="event.preventDefault(); fazerLogin();">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
+          <input type="email" id="loginEmail" value="admin@rpprospect.com" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
+          <input type="password" id="loginSenha" value="123456" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg transition-all shadow-lg shadow-indigo-600/30">
+          Entrar no Sistema
+        </button>
+      </form>
     </div>
+  </div>
 
-    <!-- Main Layout -->
-    <div id="screen-main" class="hidden flex-1 flex flex-col md:flex-row overflow-hidden">
-      <!-- Sidebar -->
-      <aside class="w-full md:w-64 bg-surface-900 border-r border-slate-800 flex flex-col justify-between p-4">
-        <div class="space-y-6">
-          <div class="flex items-center space-x-3 px-2">
-            <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center font-bold text-white text-sm">RP</div>
-            <span class="font-bold tracking-wide text-white">RP Prospect</span>
+  <!-- LAYOUT PRINCIPAL -->
+  <div id="appContainer" class="hidden flex-1 flex flex-col md:flex-row min-h-screen">
+    
+    <!-- MENU LATERAL -->
+    <aside class="w-full md:w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between">
+      <div class="space-y-8">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white text-lg">
+            RP
           </div>
-          <nav class="space-y-1">
-            <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium bg-brand-600/10 text-brand-500">
-              <i class="fa-solid fa-house w-4 text-center"></i>
-              <span>Dashboard</span>
-            </button>
-            <button onclick="app.navigate('search')" id="nav-search" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-surface-800 hover:text-white">
-              <i class="fa-solid fa-magnifying-glass w-4 text-center"></i>
-              <span>Buscar Empresas</span>
-            </button>
-            <button onclick="app.navigate('saved')" id="nav-saved" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-surface-800 hover:text-white">
-              <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-bookmark w-4 text-center"></i>
-                <span>Empresas Salvas</span>
-              </div>
-              <span id="badge-saved-count" class="bg-brand-600/30 text-brand-400 px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
-            </button>
-          </nav>
+          <div>
+            <h1 class="font-bold text-white leading-tight">RP Prospect</h1>
+            <span class="text-xs text-indigo-400">Prospecção B2B</span>
+          </div>
         </div>
-        <div class="pt-4 border-t border-slate-800">
-          <button onclick="app.logout()" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400">
-            <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
-            <span>Sair</span>
+
+        <nav class="space-y-2">
+          <button onclick="mudarAba('buscar')" id="navSearch" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Buscar Empresas</span>
           </button>
+          <button onclick="mudarAba('salvas')" id="navSaved" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all">
+            <i class="fa-solid fa-bookmark"></i>
+            <span>Empresas Salvas</span>
+            <span id="badgeSaved" class="ml-auto bg-slate-800 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+          </button>
+          <button onclick="mudarAba('template')" id="navTemplate" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Template de Abordagem</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="pt-6 border-t border-slate-800">
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-4">
+          <span>Status do Sistema</span>
+          <span class="inline-flex items-center text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> Online</span>
         </div>
-      </aside>
+        <button onclick="fazerLogout()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs font-medium border border-slate-800 hover:border-rose-900/50 transition-all">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
 
-      <!-- Main Content -->
-      <main class="flex-1 flex flex-col overflow-y-auto bg-surface-950 p-6 space-y-6">
-        <!-- View: Dashboard -->
-        <div id="view-dashboard" class="space-y-6">
-          <header class="flex justify-between items-center">
-            <div>
-              <h2 class="text-xl font-bold text-white">Visão Geral</h2>
-              <p class="text-xs text-slate-400">Métricas gerais da sua sessão</p>
-            </div>
-            <button onclick="app.navigate('search')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-4 py-2 rounded-lg font-medium">Nova Busca</button>
-          </header>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Pesquisadas Agora</p>
-              <h3 id="stat-searched" class="text-2xl font-bold text-white mt-1">0</h3>
-            </div>
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Guardadas na Memória</p>
-              <h3 id="stat-saved" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
-            </div>
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Sessão Atual</p>
-              <h3 class="text-2xl font-bold text-brand-500 mt-1">Ativa</h3>
-            </div>
-          </div>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+      
+      <!-- ABA 1: BUSCAR EMPRESAS -->
+      <section id="abaBuscar" class="space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Buscar Empresas Reais</h2>
+          <p class="text-slate-400 text-sm">Pesquisa em tempo real no Google Maps enriquecida com IA.</p>
         </div>
 
-        <!-- View: Search -->
-        <div id="view-search" class="hidden space-y-6">
-          <div class="flex justify-between items-end">
+        <!-- FORMULÁRIO DE PESQUISA -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <h2 class="text-xl font-bold text-white">Busca de Leads com IA</h2>
-              <p class="text-xs text-slate-400">Mapeie empresas em tempo real</p>
-            </div>
-            <button onclick="app.clearSearchResults()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center space-x-2">
-              <i class="fa-solid fa-trash-can"></i>
-              <span>Limpar Busca Atual</span>
-            </button>
-          </div>
-
-          <form onsubmit="app.executeSearch(event)" class="bg-surface-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 md:grid-cols-5 gap-3">
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">O que você vende?</label>
-              <input type="text" id="search-offering" placeholder="Ex: Software de Gestão" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Cidade</label>
+              <input type="text" id="searchCity" value="São Paulo" placeholder="Ex: São Paulo" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Segmento Alvo</label>
-              <input type="text" id="search-segment" placeholder="Ex: Advogados" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Segmento / Setor</label>
+              <input type="text" id="searchSegment" value="Advocacia" placeholder="Ex: Escritórios de Advocacia" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Cidade</label>
-              <input type="text" id="search-city" placeholder="Ex: São Paulo" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Sua Proposta de Valor</label>
+              <input type="text" id="searchOffering" value="Software de Gestão Comercial" placeholder="Ex: Serviços de Marketing" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Qtd. Resultados</label>
-              <select id="search-limit" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quantidade</label>
+              <select id="searchLimit" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
                 <option value="3">3 Empresas</option>
                 <option value="5" selected>5 Empresas</option>
                 <option value="10">10 Empresas</option>
               </select>
             </div>
-            <div class="flex items-end">
-              <button type="submit" id="btn-search-submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span>Encontrar Clientes</span>
-              </button>
-            </div>
-          </form>
+          </div>
 
-          <div class="bg-surface-900 border border-slate-800 rounded-xl overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-surface-800 text-slate-400 border-b border-slate-700">
-                  <tr>
-                    <th class="p-3 w-1/4">Empresa / Setor</th>
-                    <th class="p-3 w-1/3">Descrição</th>
-                    <th class="p-3">Contatos</th>
-                    <th class="p-3 text-right">Ações</th>
-                  </tr>
-                </thead>
-                <tbody id="search-results-table" class="divide-y divide-slate-800 text-slate-300">
-                  <tr>
-                    <td colspan="4" class="p-4 text-center text-slate-500">Nenhuma pesquisa feita nesta sessão. Preencha os campos acima.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+            <button onclick="executarBusca()" id="btnBusca" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-3 rounded-xl transition-all flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/30">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Encontrar Clientes</span>
+            </button>
+
+            <button onclick="limparBusca()" class="w-full sm:w-auto bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-900/50 px-5 py-3 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>Limpar Busca Atual</span>
+            </button>
           </div>
         </div>
 
-        <!-- View: Saved Companies -->
-        <div id="view-saved" class="hidden space-y-6">
+        <!-- INDICADOR DE CARREGAMENTO -->
+        <div id="searchLoading" class="hidden text-center py-12 space-y-3">
+          <div class="inline-block w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+          <p class="text-slate-400 text-sm">Consultando Google Maps e gerando inteligência comercial...</p>
+        </div>
+
+        <!-- TABELA DE RESULTADOS -->
+        <div id="resultsWrapper" class="hidden bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Resultados da Busca</span>
+            <span id="resultsCount" class="text-xs text-indigo-400 font-medium"></span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase text-slate-400">
+                  <th class="p-4">Empresa / Setor</th>
+                  <th class="p-4">Descrição</th>
+                  <th class="p-4">Contatos Reais</th>
+                  <th class="p-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="searchResultsTable" class="divide-y divide-slate-800 text-sm">
+                <!-- Linhas preenchidas via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 2: EMPRESAS SALVAS -->
+      <section id="abaSalvas" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold text-white">Empresas Guardadas</h2>
-            <p class="text-xs text-slate-400">Leads salvos para contato direto</p>
+            <h2 class="text-2xl font-bold text-white">Empresas Salvas (Carteira)</h2>
+            <p class="text-slate-400 text-sm">Seus leads guardados para prospecção direta.</p>
           </div>
-          <div class="bg-surface-900 border border-slate-800 rounded-xl overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-surface-800 text-slate-400 border-b border-slate-700">
-                  <tr>
-                    <th class="p-3">Empresa</th>
-                    <th class="p-3">Setor</th>
-                    <th class="p-3">Contatos</th>
-                    <th class="p-3 text-right">Ação</th>
-                  </tr>
-                </thead>
-                <tbody id="saved-results-table" class="divide-y divide-slate-800 text-slate-300">
-                  <tr>
-                    <td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa guardada ainda. Clique no ícone de salvar em uma busca.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm shadow-lg shadow-emerald-600/20">
+            <i class="fa-solid fa-file-excel"></i>
+            <span>Exportar para CSV / Excel</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase text-slate-400">
+                  <th class="p-4">Empresa / Setor</th>
+                  <th class="p-4">Descrição</th>
+                  <th class="p-4">Contatos</th>
+                  <th class="p-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="savedResultsTable" class="divide-y divide-slate-800 text-sm">
+                <!-- Linhas salvas via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="savedEmptyState" class="p-12 text-center text-slate-500 space-y-2">
+            <i class="fa-solid fa-bookmark text-3xl mb-2 text-slate-700"></i>
+            <p>Nenhuma empresa guardada na sua carteira ainda.</p>
           </div>
         </div>
-      </main>
-    </div>
+      </section>
 
-    <!-- Modal -->
-    <div id="modal-company" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-surface-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4">
-        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+      <!-- ABA 3: TEMPLATE DE ABORDAGEM -->
+      <section id="abaTemplate" class="hidden space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Template de Mensagem Padronizado</h2>
+          <p class="text-slate-400 text-sm">Defina a estrutura da mensagem base. A IA personalizará os dados de cada empresa automaticamente.</p>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
           <div>
-            <h3 id="modal-company-name" class="text-lg font-bold text-white">---</h3>
-            <p id="modal-company-category" class="text-xs text-slate-400">---</p>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Mensagem Modelo Base</label>
+            <textarea id="templateText" rows="6" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-slate-100 text-sm focus:outline-none focus:border-indigo-500">Olá! Tudo bem? Falo com a equipe da {empresa}. 
+
+Acompanho o trabalho de vocês no segmento de {setor} em {cidade} e percebi uma oportunidade incrível de colaborar com o crescimento comercial de vocês.
+
+Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minutos para conversarmos esta semana?</textarea>
           </div>
-          <button onclick="app.closeModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
+            <h4 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Variáveis Disponíveis para Usar no Texto:</h4>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{empresa}</code> Nome da Empresa</span>
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{setor}</code> Setor de Atuação</span>
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{cidade}</code> Cidade</span>
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{proposta}</code> Sua Oferta/Serviço</span>
+            </div>
+          </div>
+
+          <button onclick="salvarTemplate()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm flex items-center space-x-2">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Salvar Template Padronizado</span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE DETALHES & GERADOR DE ABORDAGEM -->
+  <div id="modalDetails" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-start justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 id="modalTitle" class="text-xl font-bold text-white">---</h3>
+          <span id="modalSector" class="text-xs text-indigo-400">---</span>
+        </div>
+        <button onclick="fecharModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descrição / Histórico</h4>
+          <p id="modalDesc" class="text-sm text-slate-300 bg-slate-950 p-4 rounded-xl border border-slate-800">---</p>
         </div>
 
-        <div class="space-y-3 text-xs">
-          <p id="modal-company-desc" class="text-slate-300 bg-surface-800/50 p-3 rounded-lg border border-slate-800"></p>
-
-          <div class="grid grid-cols-2 gap-2 text-slate-300">
-            <div class="bg-surface-800 p-2.5 rounded-lg border border-slate-700">
-              <span class="text-[10px] text-slate-400 block mb-1 font-bold">Telefones:</span>
-              <div id="modal-phones-list" class="space-y-1"></div>
-            </div>
-            <div class="bg-surface-800 p-2.5 rounded-lg border border-slate-700">
-              <span class="text-[10px] text-slate-400 block mb-1 font-bold">Canais Digitais:</span>
-              <div id="modal-digital-list" class="space-y-1"></div>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Telefone Principal</h4>
+            <p id="modalPhone" class="text-sm text-slate-200 bg-slate-950 p-3 rounded-xl border border-slate-800">---</p>
           </div>
-
-          <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-slate-200">Abordagem Customizada (Copiloto)</span>
-              <button onclick="app.generateApproachWithAI()" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 px-2 py-1 rounded text-xs font-medium">Gerar Abordagem</button>
-            </div>
-            <textarea id="ai-message" rows="3" class="w-full bg-surface-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:outline-none" placeholder="A mensagem gerada aparecerá aqui..."></textarea>
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Website Oficial</h4>
+            <div id="modalWebsite" class="text-sm text-indigo-400 bg-slate-950 p-3 rounded-xl border border-slate-800 truncate">---</div>
           </div>
         </div>
 
-        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-          <button onclick="app.closeModal()" class="px-4 py-2 bg-surface-800 hover:bg-surface-700 text-slate-300 rounded-lg text-xs">Fechar</button>
-          <button id="btn-modal-save" onclick="" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium">Guardar Empresa</button>
+        <!-- MENSAGEM GERADA -->
+        <div class="space-y-2 pt-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-400 flex items-center space-x-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Mensagem de Prospecção Adaptada</span>
+            </h4>
+            <button onclick="copiarMensagem()" id="btnCopyMsg" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center space-x-1.5">
+              <i class="fa-regular fa-copy"></i>
+              <span id="copyMsgText">Copiar Mensagem</span>
+            </button>
+          </div>
+          
+          <div id="modalMsgLoading" class="hidden text-center py-6">
+            <div class="inline-block w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+            <p class="text-xs text-slate-400 mt-2">Personalizando modelo com inteligência artificial...</p>
+          </div>
+
+          <textarea id="modalMsgText" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
       </div>
+
+      <div class="flex justify-between items-center border-t border-slate-800 pt-4">
+        <a id="modalWhatsappBtn" href="#" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all items-center space-x-2">
+          <i class="fa-brands fa-whatsapp text-lg"></i>
+          <span>Abrir no WhatsApp</span>
+        </a>
+        <button onclick="fecharModal()" class="ml-auto bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-5 py-2.5 rounded-xl text-sm transition-all">
+          Fechar
+        </button>
+      </div>
+
     </div>
   </div>
 
+
+  <!-- LÓGICA JAVASCRIPT INTEGRADA -->
   <script>
-    window.SUPABASE_FUNCTION_URL = 'https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro';
+    // CONFIGURAÇÃO SUPABASE EDGE FUNCTION
+    const EDGE_FUNCTION_URL = "https://aomakxrtqvhbmsuwwqks.supabase.co/functions/v1/rppro";
 
-    // Memória da aplicação (Sem localStorage)
-    window.state = {
-      searchResults: [],
-      savedCompanies: [],
-      activeCompanyId: null
-    };
+    // ESTADO DA APLICAÇÃO (MEMÓRIA)
+    let buscaAtual = [];
+    let empresasSalvas = [];
+    let empresaSelecionadaModal = null;
 
-    window.app = {
-      init() {
-        this.renderDashboard();
-        this.renderSearchTable();
-        this.renderSavedTable();
-      },
+    // INICIALIZAÇÃO
+    window.addEventListener('DOMContentLoaded', () => {
+      atualizarTabelaSalvas();
+    });
 
-      login(e) {
-        if (e) e.preventDefault();
-        document.getElementById('screen-login').classList.add('hidden');
-        document.getElementById('screen-main').classList.remove('hidden');
-        this.init();
-      },
+    // SISTEMA DE AUTENTICAÇÃO SIMPLES
+    function fazerLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const senha = document.getElementById('loginSenha').value;
 
-      logout() {
-        document.getElementById('screen-main').classList.add('hidden');
-        document.getElementById('screen-login').classList.remove('hidden');
-      },
+      if (email === 'admin@rpprospect.com' && senha === '123456') {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appContainer').classList.remove('hidden');
+      } else {
+        alert('Credenciais incorretas!');
+      }
+    }
 
-      navigate(view) {
-        ['dashboard', 'search', 'saved'].forEach(v => {
-          const viewEl = document.getElementById(`view-${v}`);
-          const navBtn = document.getElementById(`nav-${v}`);
-          if (viewEl) viewEl.classList.add('hidden');
-          if (navBtn) {
-            navBtn.classList.remove('bg-brand-600/10', 'text-brand-500');
-            navBtn.classList.add('text-slate-400');
-          }
+    function fazerLogout() {
+      buscaAtual = [];
+      document.getElementById('searchResultsTable').innerHTML = '';
+      document.getElementById('resultsWrapper').classList.add('hidden');
+      document.getElementById('appContainer').classList.add('hidden');
+      document.getElementById('loginSection').classList.remove('hidden');
+    }
+
+    // NAVEGAÇÃO DE ABAS
+    function mudarAba(aba) {
+      document.getElementById('abaBuscar').classList.add('hidden');
+      document.getElementById('abaSalvas').classList.add('hidden');
+      document.getElementById('abaTemplate').classList.add('hidden');
+
+      document.getElementById('navSearch').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all";
+      document.getElementById('navSaved').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all";
+      document.getElementById('navTemplate').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all";
+
+      if (aba === 'buscar') {
+        document.getElementById('abaBuscar').classList.remove('hidden');
+        document.getElementById('navSearch').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all";
+      } else if (aba === 'salvas') {
+        document.getElementById('abaSalvas').classList.remove('hidden');
+        document.getElementById('navSaved').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all";
+      } else if (aba === 'template') {
+        document.getElementById('abaTemplate').classList.remove('hidden');
+        document.getElementById('navTemplate').className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition-all";
+      }
+    }
+
+    // BUSCA DE LEADS NA EDGE FUNCTION
+    async function executarBusca() {
+      const city = document.getElementById('searchCity').value;
+      const segment = document.getElementById('searchSegment').value;
+      const offering = document.getElementById('searchOffering').value;
+      const limit = parseInt(document.getElementById('searchLimit').value);
+
+      if (!city || !segment) {
+        alert('Por favor, informe a Cidade e o Segmento.');
+        return;
+      }
+
+      document.getElementById('searchLoading').classList.remove('hidden');
+      document.getElementById('resultsWrapper').classList.add('hidden');
+
+      try {
+        const response = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'search',
+            payload: { city, segment, offering, limit }
+          })
         });
 
-        const activeView = document.getElementById(`view-${view}`);
-        const activeNav = document.getElementById(`nav-${view}`);
-        if (activeView) activeView.classList.remove('hidden');
-        if (activeNav) {
-          activeNav.classList.add('bg-brand-600/10', 'text-brand-500');
-          activeNav.classList.remove('text-slate-400');
-        }
-      },
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error);
 
-      async executeSearch(e) {
-        if (e) e.preventDefault();
-        const offering = document.getElementById('search-offering').value;
-        const segment = document.getElementById('search-segment').value;
-        const city = document.getElementById('search-city').value;
-        const limit = parseInt(document.getElementById('search-limit').value) || 5;
-        const btn = document.getElementById('btn-search-submit');
+        let parsed = JSON.parse(data.result);
+        buscaAtual = parsed.companies || [];
 
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Buscando (${limit})...</span>`;
-        btn.disabled = true;
-
-        try {
-          const res = await fetch(window.SUPABASE_FUNCTION_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'search',
-              payload: { city, segment, offering, limit }
-            })
-          });
-
-          const rawText = await res.text();
-          if (!res.ok) throw new Error(rawText);
-
-          const data = JSON.parse(rawText);
-          const parsedContent = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
-          const fetched = parsedContent.companies || [];
-
-          window.state.searchResults = fetched.map((c, i) => ({
-            id: `lead-${Date.now()}-${i}`,
-            nome: c.nome,
-            setor: c.setor || segment,
-            descricao: c.descricao || 'Sem descrição cadastrada.',
-            telefones: c.telefones || [],
-            whatsapp: c.whatsapp || '',
-            site: c.site || '#'
-          }));
-
-        } catch (err) {
-          console.error(err);
-          alert('Erro ao realizar busca via Edge Function.');
-        } finally {
-          btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
-          btn.disabled = false;
-          this.renderSearchTable();
-          this.renderDashboard();
-        }
-      },
-
-      clearSearchResults() {
-        window.state.searchResults = [];
-        this.renderSearchTable();
-        this.renderDashboard();
-      },
-
-      renderSearchTable() {
-        const tbody = document.getElementById('search-results-table');
-        if (!tbody) return;
-
-        if (window.state.searchResults.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa na busca atual.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = window.state.searchResults.map(c => {
-          const isSaved = window.state.savedCompanies.some(s => s.nome === c.nome);
-          const phoneText = c.telefones.length > 0 ? c.telefones[0].telefone : 'N/A';
-          const cleanWa = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
-          const waButton = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" class="ml-2 text-emerald-400 hover:text-emerald-300"><i class="fa-brands fa-whatsapp text-sm"></i></a>` : '';
-
-          return `
-            <tr class="hover:bg-surface-800/50">
-              <td class="p-3">
-                <div class="font-bold text-white">${c.nome}</div>
-                <div class="text-[10px] text-slate-400">${c.setor}</div>
-              </td>
-              <td class="p-3 text-slate-400 text-[11px] max-w-xs truncate" title="${c.descricao}">${c.descricao}</td>
-              <td class="p-3 text-slate-300">
-                <span>${phoneText}</span>
-                ${waButton}
-              </td>
-              <td class="p-3 text-right space-x-1">
-                <button onclick="app.toggleSave('${c.id}')" class="${isSaved ? 'bg-emerald-600/20 text-emerald-400' : 'bg-surface-800 text-slate-300 hover:text-white'} px-2.5 py-1 rounded text-xs">
-                  <i class="fa-solid ${isSaved ? 'fa-check' : 'fa-bookmark'}"></i> ${isSaved ? 'Guardada' : 'Guardar'}
-                </button>
-                <button onclick="app.openModal('${c.id}')" class="bg-brand-600 hover:bg-brand-700 text-white px-2.5 py-1 rounded text-xs">Detalhes</button>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      },
-
-      toggleSave(id) {
-        const company = window.state.searchResults.find(c => c.id === id) || window.state.savedCompanies.find(c => c.id === id);
-        if (!company) return;
-
-        const existsIdx = window.state.savedCompanies.findIndex(s => s.nome === company.nome);
-        if (existsIdx >= 0) {
-          window.state.savedCompanies.splice(existsIdx, 1);
-        } else {
-          window.state.savedCompanies.push(company);
-        }
-
-        this.renderSearchTable();
-        this.renderSavedTable();
-        this.renderDashboard();
-      },
-
-      renderSavedTable() {
-        const tbody = document.getElementById('saved-results-table');
-        const badge = document.getElementById('badge-saved-count');
-        if (badge) badge.innerText = window.state.savedCompanies.length;
-        if (!tbody) return;
-
-        if (window.state.savedCompanies.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa guardada.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = window.state.savedCompanies.map(c => {
-          const phoneText = c.telefones.length > 0 ? c.telefones[0].telefone : 'N/A';
-          return `
-            <tr class="hover:bg-surface-800/50">
-              <td class="p-3 font-bold text-white">${c.nome}</td>
-              <td class="p-3 text-slate-400">${c.setor}</td>
-              <td class="p-3 text-slate-300">${phoneText}</td>
-              <td class="p-3 text-right">
-                <button onclick="app.toggleSave('${c.id}')" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-2.5 py-1 rounded text-xs">Remover</button>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      },
-
-      openModal(id) {
-        const company = window.state.searchResults.find(c => c.id === id) || window.state.savedCompanies.find(c => c.id === id);
-        if (!company) return;
-        window.state.activeCompanyId = id;
-
-        document.getElementById('modal-company-name').innerText = company.nome;
-        document.getElementById('modal-company-category').innerText = company.setor;
-        document.getElementById('modal-company-desc').innerText = company.descricao;
-        document.getElementById('ai-message').value = "";
-
-        const phonesContainer = document.getElementById('modal-phones-list');
-        phonesContainer.innerHTML = company.telefones.length > 0 
-          ? company.telefones.map(t => `<div class="text-slate-200"><i class="fa-solid fa-phone text-slate-500 mr-1"></i>${t.telefone} <span class="text-[9px] text-slate-500">(${t.tipo})</span></div>`).join('')
-          : '<span class="text-slate-500">Nenhum fixo listado</span>';
-
-        const digitalContainer = document.getElementById('modal-digital-list');
-        const cleanWa = company.whatsapp ? company.whatsapp.replace(/\D/g, '') : '';
-        digitalContainer.innerHTML = `
-          <div><i class="fa-solid fa-globe text-slate-500 mr-1"></i><a href="${company.site}" target="_blank" class="text-brand-400 hover:underline">Acessar Site</a></div>
-          ${cleanWa ? `<div><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i><a href="https://wa.me/${cleanWa}" target="_blank" class="text-emerald-400 hover:underline">${company.whatsapp}</a></div>` : ''}
-        `;
-
-        const btnSave = document.getElementById('btn-modal-save');
-        btnSave.onclick = () => { app.toggleSave(id); app.closeModal(); };
-
-        document.getElementById('modal-company').classList.remove('hidden');
-      },
-
-      closeModal() {
-        document.getElementById('modal-company').classList.add('hidden');
-      },
-
-      async generateApproachWithAI() {
-        const company = window.state.searchResults.find(c => c.id === window.state.activeCompanyId) || window.state.savedCompanies.find(c => c.id === window.state.activeCompanyId);
-        const offering = document.getElementById('search-offering').value || "nossas soluções corporativas";
-        document.getElementById('ai-message').value = "Escrevendo abordagem de alta conversão...";
-
-        try {
-          const res = await fetch(window.SUPABASE_FUNCTION_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'approach',
-              payload: { nome: company.nome, offering }
-            })
-          });
-
-          const data = await res.json();
-          document.getElementById('ai-message').value = data.result;
-        } catch (err) {
-          console.error(err);
-          document.getElementById('ai-message').value = "Erro ao gerar abordagem.";
-        }
-      },
-
-      renderDashboard() {
-        const searched = document.getElementById('stat-searched');
-        const saved = document.getElementById('stat-saved');
-        if (searched) searched.innerText = window.state.searchResults.length;
-        if (saved) saved.innerText = window.state.savedCompanies.length;
+        renderizarTabelaBusca();
+      } catch (err) {
+        alert('Erro ao buscar empresas: ' + err.message);
+      } finally {
+        document.getElementById('searchLoading').classList.add('hidden');
       }
-    };
+    }
+
+    function renderizarTabelaBusca() {
+      const tbody = document.getElementById('searchResultsTable');
+      tbody.innerHTML = '';
+
+      if (buscaAtual.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">Nenhuma empresa encontrada para esta pesquisa.</td></tr>`;
+      } else {
+        buscaAtual.forEach((empresa, idx) => {
+          const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
+          const temTel = telPrincipal !== 'Não informado';
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-900/50 transition-all">
+              <td class="p-4">
+                <div class="font-semibold text-white">${empresa.nome}</div>
+                <div class="text-xs text-indigo-400">${empresa.setor || 'Geral'}</div>
+              </td>
+              <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
+              <td class="p-4">
+                <div class="flex items-center space-x-2">
+                  <span class="${temTel ? 'text-slate-200' : 'text-slate-500 font-italic'}">${telPrincipal}</span>
+                  ${empresa.whatsapp ? '<i class="fa-brands fa-whatsapp text-emerald-400" title="WhatsApp disponível"></i>' : ''}
+                </div>
+              </td>
+              <td class="p-4 text-right space-x-2">
+                <button onclick="guardarEmpresa(${idx})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition-all">
+                  Guardar
+                </button>
+                <button onclick="abrirModal(${idx}, 'busca')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
+                  Detalhes
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      document.getElementById('resultsCount').innerText = `${buscaAtual.length} empresa(s) encontrada(s)`;
+      document.getElementById('resultsWrapper').classList.remove('hidden');
+    }
+
+    function limparBusca() {
+      buscaAtual = [];
+      document.getElementById('searchResultsTable').innerHTML = '';
+      document.getElementById('resultsWrapper').classList.add('hidden');
+    }
+
+    // CARTEIRA / EMPRESAS SALVAS
+    function guardarEmpresa(index) {
+      const item = buscaAtual[index];
+      const existe = empresasSalvas.some(e => e.nome === item.nome);
+
+      if (!existe) {
+        empresasSalvas.push(item);
+        atualizarTabelaSalvas();
+        alert(`"${item.nome}" foi guardada na sua carteira!`);
+      } else {
+        alert('Esta empresa já está na sua lista de salvas.');
+      }
+    }
+
+    function removerSalva(index) {
+      empresasSalvas.splice(index, 1);
+      atualizarTabelaSalvas();
+    }
+
+    function atualizarTabelaSalvas() {
+      const tbody = document.getElementById('savedResultsTable');
+      const emptyState = document.getElementById('savedEmptyState');
+      document.getElementById('badgeSaved').innerText = empresasSalvas.length;
+
+      tbody.innerHTML = '';
+
+      if (empresasSalvas.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        empresasSalvas.forEach((empresa, idx) => {
+          const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-900/50 transition-all">
+              <td class="p-4">
+                <div class="font-semibold text-white">${empresa.nome}</div>
+                <div class="text-xs text-indigo-400">${empresa.setor || 'Geral'}</div>
+              </td>
+              <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
+              <td class="p-4 text-slate-200">${telPrincipal}</td>
+              <td class="p-4 text-right space-x-2">
+                <button onclick="removerSalva(${idx})" class="bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition-all">
+                  Remover
+                </button>
+                <button onclick="abrirModal(${idx}, 'salvas')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
+                  Detalhes
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    // EXPORTAR PARA CSV / EXCEL
+    function exportarCSV() {
+      if (empresasSalvas.length === 0) {
+        alert('Sua lista de empresas salvas está vazia.');
+        return;
+      }
+
+      let csv = '\uFEFF'; // UTF-8 BOM para abrir acentos corretamente no Excel
+      csv += 'Nome;Setor;Telefone;Site;Descricao\n';
+
+      empresasSalvas.forEach(e => {
+        const tel = (e.telefones && e.telefones.length > 0) ? e.telefones[0].telefone : 'N/A';
+        const site = e.site || 'N/A';
+        const desc = (e.descricao || '').replace(/;/g, ' ');
+
+        csv += `"${e.nome}";"${e.setor}";"${tel}";"${site}";"${desc}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `leads_rp_prospect_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // GERENCIAMENTO DE TEMPLATES
+    function salvarTemplate() {
+      alert('Template de mensagem salvo com sucesso!');
+    }
+
+    // MODAL DE DETALHES E IA
+    async function abrirModal(index, origem) {
+      empresaSelecionadaModal = origem === 'busca' ? buscaAtual[index] : empresasSalvas[index];
+
+      document.getElementById('modalTitle').innerText = empresaSelecionadaModal.nome;
+      document.getElementById('modalSector').innerText = empresaSelecionadaModal.setor || 'Geral';
+      document.getElementById('modalDesc').innerText = empresaSelecionadaModal.descricao || 'Sem descrição cadastrada.';
+
+      const telPrincipal = (empresaSelecionadaModal.telefones && empresaSelecionadaModal.telefones.length > 0) 
+        ? empresaSelecionadaModal.telefones[0].telefone 
+        : 'Não informado';
+      document.getElementById('modalPhone').innerText = telPrincipal;
+
+      const siteElem = document.getElementById('modalWebsite');
+      if (empresaSelecionadaModal.site && empresaSelecionadaModal.site !== '#') {
+        siteElem.innerHTML = `<a href="${empresaSelecionadaModal.site}" target="_blank" class="hover:underline flex items-center space-x-1"><i class="fa-solid fa-globe text-xs mr-1"></i>${empresaSelecionadaModal.site}</a>`;
+      } else {
+        siteElem.innerText = 'Não informado';
+      }
+
+      // WhatsApp Btn
+      const waBtn = document.getElementById('modalWhatsappBtn');
+      if (empresaSelecionadaModal.whatsapp) {
+        const numClean = empresaSelecionadaModal.whatsapp.replace(/\D/g, '');
+        waBtn.href = `https://wa.me/${numClean}`;
+        waBtn.classList.remove('hidden');
+        waBtn.classList.add('flex');
+      } else {
+        waBtn.classList.add('hidden');
+        waBtn.classList.remove('flex');
+      }
+
+      // Gerar mensagem com base no Template e dados da empresa
+      const city = document.getElementById('searchCity').value || 'sua cidade';
+      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
+      const templateBase = document.getElementById('templateText').value;
+
+      // Substituição direta das variáveis no modelo
+      let mensagemFormatada = templateBase
+        .replace(/{empresa}/g, empresaSelecionadaModal.nome)
+        .replace(/{setor}/g, empresaSelecionadaModal.setor || 'seu segmento')
+        .replace(/{cidade}/g, city)
+        .replace(/{proposta}/g, offering);
+
+      document.getElementById('modalMsgText').value = mensagemFormatada;
+      document.getElementById('modalDetails').classList.remove('hidden');
+    }
+
+    function fecharModal() {
+      document.getElementById('modalDetails').classList.add('hidden');
+      document.getElementById('copyMsgText').innerText = "Copiar Mensagem";
+    }
+
+    function copiarMensagem() {
+      const txt = document.getElementById('modalMsgText');
+      txt.select();
+      navigator.clipboard.writeText(txt.value);
+      
+      const copyTextSpan = document.getElementById('copyMsgText');
+      copyTextSpan.innerText = "Copiado!";
+      setTimeout(() => {
+        copyTextSpan.innerText = "Copiar Mensagem";
+      }, 2000);
+    }
   </script>
 </body>
 </html>
