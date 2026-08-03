@@ -22,7 +22,7 @@
 </head>
 <body class="bg-surface-950 text-slate-100 font-sans h-full antialiased selection:bg-brand-600 selection:text-white">
   <div id="app" class="h-full flex flex-col">
-    <!-- Screen 1: Login -->
+    <!-- Login Screen -->
     <div id="screen-login" class="flex-1 flex items-center justify-center p-4">
       <div class="w-full max-w-md bg-surface-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
         <div class="text-center space-y-2">
@@ -35,11 +35,11 @@
         <form onsubmit="app.login(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">E-mail</label>
-            <input type="email" value="demo@rpprospect.com" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500" required>
+            <input type="email" id="login-email" value="admin@rpprospect.com" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 text-white" required>
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Senha</label>
-            <input type="password" value="••••••••" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500" required>
+            <input type="password" id="login-pass" value="123456" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 text-white" required>
           </div>
           <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200 cursor-pointer">
             Entrar no Sistema
@@ -66,9 +66,12 @@
               <i class="fa-solid fa-magnifying-glass w-4 text-center"></i>
               <span>Buscar Empresas</span>
             </button>
-            <button onclick="app.navigate('crm')" id="nav-crm" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-surface-800 hover:text-white">
-              <i class="fa-solid fa-kanban w-4 text-center"></i>
-              <span>CRM Pipeline</span>
+            <button onclick="app.navigate('saved')" id="nav-saved" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-surface-800 hover:text-white">
+              <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-bookmark w-4 text-center"></i>
+                <span>Empresas Salvas</span>
+              </div>
+              <span id="badge-saved-count" class="bg-brand-600/30 text-brand-400 px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
             </button>
           </nav>
         </div>
@@ -87,50 +90,60 @@
           <header class="flex justify-between items-center">
             <div>
               <h2 class="text-xl font-bold text-white">Visão Geral</h2>
-              <p class="text-xs text-slate-400">Métricas gerais de prospecção comercial</p>
+              <p class="text-xs text-slate-400">Métricas gerais da sua sessão</p>
             </div>
             <button onclick="app.navigate('search')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-4 py-2 rounded-lg font-medium">Nova Busca</button>
           </header>
 
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Leads Encontrados</p>
-              <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">0</h3>
+              <p class="text-xs text-slate-400">Pesquisadas Agora</p>
+              <h3 id="stat-searched" class="text-2xl font-bold text-white mt-1">0</h3>
             </div>
             <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Em Qualificação</p>
-              <h3 id="stat-qualifying" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
+              <p class="text-xs text-slate-400">Guardadas na Memória</p>
+              <h3 id="stat-saved" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
             </div>
             <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Propostas Enviadas</p>
-              <h3 id="stat-proposals" class="text-2xl font-bold text-brand-500 mt-1">0</h3>
-            </div>
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
-              <p class="text-xs text-slate-400">Contratos Fechados</p>
-              <h3 id="stat-closed" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+              <p class="text-xs text-slate-400">Sessão Atual</p>
+              <h3 class="text-2xl font-bold text-brand-500 mt-1">Ativa</h3>
             </div>
           </div>
         </div>
 
         <!-- View: Search -->
         <div id="view-search" class="hidden space-y-6">
-          <div>
-            <h2 class="text-xl font-bold text-white">Busca de Leads com IA</h2>
-            <p class="text-xs text-slate-400">Mapeie empresas reais e crie abordagens com IA</p>
+          <div class="flex justify-between items-end">
+            <div>
+              <h2 class="text-xl font-bold text-white">Busca de Leads com IA</h2>
+              <p class="text-xs text-slate-400">Mapeie empresas em tempo real</p>
+            </div>
+            <button onclick="app.clearSearchResults()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1.5 rounded-lg flex items-center space-x-2">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>Limpar Busca Atual</span>
+            </button>
           </div>
 
-          <form onsubmit="app.executeSearch(event)" class="bg-surface-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+          <form onsubmit="app.executeSearch(event)" class="bg-surface-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
               <label class="block text-xs font-medium text-slate-400 mb-1">O que você vende?</label>
               <input type="text" id="search-offering" placeholder="Ex: Software de Gestão" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-400 mb-1">Segmento Alvo</label>
-              <input type="text" id="search-segment" placeholder="Ex: Contabilidades" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
+              <input type="text" id="search-segment" placeholder="Ex: Advogados" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-400 mb-1">Cidade</label>
               <input type="text" id="search-city" placeholder="Ex: São Paulo" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Qtd. Resultados</label>
+              <select id="search-limit" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                <option value="3">3 Empresas</option>
+                <option value="5" selected>5 Empresas</option>
+                <option value="10">10 Empresas</option>
+              </select>
             </div>
             <div class="flex items-end">
               <button type="submit" id="btn-search-submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center space-x-2">
@@ -145,16 +158,15 @@
               <table class="w-full text-left text-xs">
                 <thead class="bg-surface-800 text-slate-400 border-b border-slate-700">
                   <tr>
-                    <th class="p-3">Empresa</th>
-                    <th class="p-3">Cidade/Setor</th>
-                    <th class="p-3">Telefone / Contato</th>
-                    <th class="p-3">Score IA</th>
-                    <th class="p-3 text-right">Ação</th>
+                    <th class="p-3 w-1/4">Empresa / Setor</th>
+                    <th class="p-3 w-1/3">Descrição</th>
+                    <th class="p-3">Contatos</th>
+                    <th class="p-3 text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody id="search-results-table" class="divide-y divide-slate-800 text-slate-300">
                   <tr>
-                    <td colspan="5" class="p-4 text-center text-slate-500">Nenhuma busca realizada ainda. Preencha os campos acima.</td>
+                    <td colspan="4" class="p-4 text-center text-slate-500">Nenhuma pesquisa feita nesta sessão. Preencha os campos acima.</td>
                   </tr>
                 </tbody>
               </table>
@@ -162,28 +174,29 @@
           </div>
         </div>
 
-        <!-- View: CRM -->
-        <div id="view-crm" class="hidden space-y-6">
+        <!-- View: Saved Companies -->
+        <div id="view-saved" class="hidden space-y-6">
           <div>
-            <h2 class="text-xl font-bold text-white">Funil de Vendas (CRM)</h2>
-            <p class="text-xs text-slate-400">Gerencie a evolução das suas prospecções</p>
+            <h2 class="text-xl font-bold text-white">Empresas Guardadas</h2>
+            <p class="text-xs text-slate-400">Leads salvos para contato direto</p>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
-              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Novo Lead</h4>
-              <div id="crm-col-novo" class="space-y-2"></div>
-            </div>
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
-              <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Em Contato</h4>
-              <div id="crm-col-contato" class="space-y-2"></div>
-            </div>
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
-              <h4 class="text-xs font-bold text-brand-500 uppercase tracking-wider">Reunião Agendada</h4>
-              <div id="crm-col-reuniao" class="space-y-2"></div>
-            </div>
-            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
-              <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Cliente Fechado</h4>
-              <div id="crm-col-fechado" class="space-y-2"></div>
+          <div class="bg-surface-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-surface-800 text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th class="p-3">Empresa</th>
+                    <th class="p-3">Setor</th>
+                    <th class="p-3">Contatos</th>
+                    <th class="p-3 text-right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="saved-results-table" class="divide-y divide-slate-800 text-slate-300">
+                  <tr>
+                    <td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa guardada ainda. Clique no ícone de salvar em uma busca.</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -202,37 +215,31 @@
         </div>
 
         <div class="space-y-3 text-xs">
-          <div class="flex items-center space-x-4 text-slate-300">
-            <div>
-              <i class="fa-solid fa-link w-4 text-brand-500"></i>
-              <a id="modal-company-site" href="#" target="_blank" class="text-brand-500 hover:underline">---</a>
+          <p id="modal-company-desc" class="text-slate-300 bg-surface-800/50 p-3 rounded-lg border border-slate-800"></p>
+
+          <div class="grid grid-cols-2 gap-2 text-slate-300">
+            <div class="bg-surface-800 p-2.5 rounded-lg border border-slate-700">
+              <span class="text-[10px] text-slate-400 block mb-1 font-bold">Telefones:</span>
+              <div id="modal-phones-list" class="space-y-1"></div>
             </div>
-            <div>
-              <i class="fa-solid fa-phone w-4 text-emerald-400"></i>
-              <span id="modal-company-phone" class="text-slate-200">---</span>
+            <div class="bg-surface-800 p-2.5 rounded-lg border border-slate-700">
+              <span class="text-[10px] text-slate-400 block mb-1 font-bold">Canais Digitais:</span>
+              <div id="modal-digital-list" class="space-y-1"></div>
             </div>
           </div>
 
           <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
             <div class="flex justify-between items-center">
-              <span class="font-bold text-slate-200">Análise de IA (Groq)</span>
-              <button onclick="app.analyzeCompanyWithAI()" class="bg-brand-600/20 text-brand-400 hover:bg-brand-600/30 px-2 py-1 rounded text-xs font-medium">Analisar Agora</button>
-            </div>
-            <p id="ai-summary" class="text-slate-400 text-xs">Clique no botão para gerar um diagnóstico comercial completo da empresa.</p>
-          </div>
-
-          <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-slate-200">Abordagem Personalizada (Copiloto)</span>
+              <span class="font-bold text-slate-200">Abordagem Customizada (Copiloto)</span>
               <button onclick="app.generateApproachWithAI()" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 px-2 py-1 rounded text-xs font-medium">Gerar Abordagem</button>
             </div>
-            <textarea id="ai-message" rows="4" class="w-full bg-surface-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:outline-none" placeholder="A mensagem de vendas aparecerá aqui..."></textarea>
+            <textarea id="ai-message" rows="3" class="w-full bg-surface-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:outline-none" placeholder="A mensagem gerada aparecerá aqui..."></textarea>
           </div>
         </div>
 
         <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
           <button onclick="app.closeModal()" class="px-4 py-2 bg-surface-800 hover:bg-surface-700 text-slate-300 rounded-lg text-xs">Fechar</button>
-          <button onclick="app.addCurrentToCRM()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium">Adicionar ao CRM</button>
+          <button id="btn-modal-save" onclick="" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium">Guardar Empresa</button>
         </div>
       </div>
     </div>
@@ -241,8 +248,10 @@
   <script>
     window.SUPABASE_FUNCTION_URL = 'https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro';
 
+    // Memória da aplicação (Sem localStorage)
     window.state = {
-      companies: JSON.parse(localStorage.getItem('rp_companies')) || [],
+      searchResults: [],
+      savedCompanies: [],
       activeCompanyId: null
     };
 
@@ -250,7 +259,7 @@
       init() {
         this.renderDashboard();
         this.renderSearchTable();
-        this.renderKanban();
+        this.renderSavedTable();
       },
 
       login(e) {
@@ -266,7 +275,7 @@
       },
 
       navigate(view) {
-        ['dashboard', 'search', 'crm'].forEach(v => {
+        ['dashboard', 'search', 'saved'].forEach(v => {
           const viewEl = document.getElementById(`view-${v}`);
           const navBtn = document.getElementById(`nav-${v}`);
           if (viewEl) viewEl.classList.add('hidden');
@@ -290,9 +299,10 @@
         const offering = document.getElementById('search-offering').value;
         const segment = document.getElementById('search-segment').value;
         const city = document.getElementById('search-city').value;
+        const limit = parseInt(document.getElementById('search-limit').value) || 5;
         const btn = document.getElementById('btn-search-submit');
 
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Mapeando Mercado...</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Buscando (${limit})...</span>`;
         btn.disabled = true;
 
         try {
@@ -301,87 +311,117 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'search',
-              payload: { city, segment, offering }
+              payload: { city, segment, offering, limit }
             })
           });
 
           const rawText = await res.text();
+          if (!res.ok) throw new Error(rawText);
 
-          if (!res.ok) {
-            alert(`Erro na Edge Function (Status ${res.status}):\n\n${rawText}`);
-            return;
-          }
-
-          let data;
-          try {
-            data = JSON.parse(rawText);
-          } catch (err) {
-            alert(`Resposta inválida do servidor:\n\n${rawText}`);
-            return;
-          }
-
-          if (data.error) {
-            const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
-            alert(`Erro retornado pela IA/Supabase:\n\n${errorMsg}`);
-            return;
-          }
-
+          const data = JSON.parse(rawText);
           const parsedContent = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
-          const fetchedCompanies = parsedContent.companies || [];
+          const fetched = parsedContent.companies || [];
 
-          const formattedCompanies = fetchedCompanies.map((c, i) => ({
+          window.state.searchResults = fetched.map((c, i) => ({
             id: `lead-${Date.now()}-${i}`,
-            name: c.name,
-            site: c.site,
-            snippet: c.snippet,
-            phone: c.phone || 'Não informado',
-            category: segment,
-            city: city,
-            score: c.score || Math.floor(Math.random() * 20) + 75,
-            status: 'Novo'
+            nome: c.nome,
+            setor: c.setor || segment,
+            descricao: c.descricao || 'Sem descrição cadastrada.',
+            telefones: c.telefones || [],
+            whatsapp: c.whatsapp || '',
+            site: c.site || '#'
           }));
 
-          window.state.companies = [...formattedCompanies, ...window.state.companies];
-          localStorage.setItem('rp_companies', JSON.stringify(window.state.companies));
-
         } catch (err) {
-          console.error('Erro na requisição:', err);
-          alert('Erro na conexão com a Edge Function.');
+          console.error(err);
+          alert('Erro ao realizar busca via Edge Function.');
         } finally {
           btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
           btn.disabled = false;
           this.renderSearchTable();
           this.renderDashboard();
-          this.renderKanban();
         }
+      },
+
+      clearSearchResults() {
+        window.state.searchResults = [];
+        this.renderSearchTable();
+        this.renderDashboard();
       },
 
       renderSearchTable() {
         const tbody = document.getElementById('search-results-table');
         if (!tbody) return;
 
-        if (window.state.companies.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nenhuma empresa encontrada. Faça uma busca acima.</td></tr>`;
+        if (window.state.searchResults.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa na busca atual.</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = window.state.companies.map(c => {
-          const cleanPhone = c.phone ? c.phone.replace(/\D/g, '') : '';
-          const whatsAppBtn = cleanPhone.length >= 10 
-            ? `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="ml-2 inline-flex items-center text-emerald-400 hover:text-emerald-300" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` 
-            : '';
+        tbody.innerHTML = window.state.searchResults.map(c => {
+          const isSaved = window.state.savedCompanies.some(s => s.nome === c.nome);
+          const phoneText = c.telefones.length > 0 ? c.telefones[0].telefone : 'N/A';
+          const cleanWa = c.whatsapp ? c.whatsapp.replace(/\D/g, '') : '';
+          const waButton = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" class="ml-2 text-emerald-400 hover:text-emerald-300"><i class="fa-brands fa-whatsapp text-sm"></i></a>` : '';
 
           return `
             <tr class="hover:bg-surface-800/50">
-              <td class="p-3 font-medium text-white">${c.name}</td>
-              <td class="p-3 text-slate-400">${c.category} em ${c.city}</td>
-              <td class="p-3 text-slate-300">
-                <span class="inline-flex items-center"><i class="fa-solid fa-phone text-[10px] text-slate-500 mr-1.5"></i>${c.phone}</span>
-                ${whatsAppBtn}
+              <td class="p-3">
+                <div class="font-bold text-white">${c.nome}</div>
+                <div class="text-[10px] text-slate-400">${c.setor}</div>
               </td>
-              <td class="p-3"><span class="bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded text-xs font-bold">${c.score}/100</span></td>
+              <td class="p-3 text-slate-400 text-[11px] max-w-xs truncate" title="${c.descricao}">${c.descricao}</td>
+              <td class="p-3 text-slate-300">
+                <span>${phoneText}</span>
+                ${waButton}
+              </td>
+              <td class="p-3 text-right space-x-1">
+                <button onclick="app.toggleSave('${c.id}')" class="${isSaved ? 'bg-emerald-600/20 text-emerald-400' : 'bg-surface-800 text-slate-300 hover:text-white'} px-2.5 py-1 rounded text-xs">
+                  <i class="fa-solid ${isSaved ? 'fa-check' : 'fa-bookmark'}"></i> ${isSaved ? 'Guardada' : 'Guardar'}
+                </button>
+                <button onclick="app.openModal('${c.id}')" class="bg-brand-600 hover:bg-brand-700 text-white px-2.5 py-1 rounded text-xs">Detalhes</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      },
+
+      toggleSave(id) {
+        const company = window.state.searchResults.find(c => c.id === id) || window.state.savedCompanies.find(c => c.id === id);
+        if (!company) return;
+
+        const existsIdx = window.state.savedCompanies.findIndex(s => s.nome === company.nome);
+        if (existsIdx >= 0) {
+          window.state.savedCompanies.splice(existsIdx, 1);
+        } else {
+          window.state.savedCompanies.push(company);
+        }
+
+        this.renderSearchTable();
+        this.renderSavedTable();
+        this.renderDashboard();
+      },
+
+      renderSavedTable() {
+        const tbody = document.getElementById('saved-results-table');
+        const badge = document.getElementById('badge-saved-count');
+        if (badge) badge.innerText = window.state.savedCompanies.length;
+        if (!tbody) return;
+
+        if (window.state.savedCompanies.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa guardada.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = window.state.savedCompanies.map(c => {
+          const phoneText = c.telefones.length > 0 ? c.telefones[0].telefone : 'N/A';
+          return `
+            <tr class="hover:bg-surface-800/50">
+              <td class="p-3 font-bold text-white">${c.nome}</td>
+              <td class="p-3 text-slate-400">${c.setor}</td>
+              <td class="p-3 text-slate-300">${phoneText}</td>
               <td class="p-3 text-right">
-                <button onclick="app.openModal('${c.id}')" class="bg-surface-800 hover:bg-surface-700 text-slate-200 px-3 py-1 rounded text-xs">Detalhes & IA</button>
+                <button onclick="app.toggleSave('${c.id}')" class="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-2.5 py-1 rounded text-xs">Remover</button>
               </td>
             </tr>
           `;
@@ -389,17 +429,29 @@
       },
 
       openModal(id) {
-        const company = window.state.companies.find(c => c.id === id);
+        const company = window.state.searchResults.find(c => c.id === id) || window.state.savedCompanies.find(c => c.id === id);
         if (!company) return;
         window.state.activeCompanyId = id;
 
-        document.getElementById('modal-company-name').innerText = company.name;
-        document.getElementById('modal-company-category').innerText = `${company.category} • ${company.city}`;
-        document.getElementById('modal-company-site').innerText = company.site;
-        document.getElementById('modal-company-site').href = company.site;
-        document.getElementById('modal-company-phone').innerText = company.phone || 'Não disponível';
-        document.getElementById('ai-summary').innerText = "Clique no botão acima para analisar com a IA.";
+        document.getElementById('modal-company-name').innerText = company.nome;
+        document.getElementById('modal-company-category').innerText = company.setor;
+        document.getElementById('modal-company-desc').innerText = company.descricao;
         document.getElementById('ai-message').value = "";
+
+        const phonesContainer = document.getElementById('modal-phones-list');
+        phonesContainer.innerHTML = company.telefones.length > 0 
+          ? company.telefones.map(t => `<div class="text-slate-200"><i class="fa-solid fa-phone text-slate-500 mr-1"></i>${t.telefone} <span class="text-[9px] text-slate-500">(${t.tipo})</span></div>`).join('')
+          : '<span class="text-slate-500">Nenhum fixo listado</span>';
+
+        const digitalContainer = document.getElementById('modal-digital-list');
+        const cleanWa = company.whatsapp ? company.whatsapp.replace(/\D/g, '') : '';
+        digitalContainer.innerHTML = `
+          <div><i class="fa-solid fa-globe text-slate-500 mr-1"></i><a href="${company.site}" target="_blank" class="text-brand-400 hover:underline">Acessar Site</a></div>
+          ${cleanWa ? `<div><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i><a href="https://wa.me/${cleanWa}" target="_blank" class="text-emerald-400 hover:underline">${company.whatsapp}</a></div>` : ''}
+        `;
+
+        const btnSave = document.getElementById('btn-modal-save');
+        btnSave.onclick = () => { app.toggleSave(id); app.closeModal(); };
 
         document.getElementById('modal-company').classList.remove('hidden');
       },
@@ -408,36 +460,8 @@
         document.getElementById('modal-company').classList.add('hidden');
       },
 
-      async analyzeCompanyWithAI() {
-        const company = window.state.companies.find(c => c.id === window.state.activeCompanyId);
-        document.getElementById('ai-summary').innerText = "Analisando dados com IA...";
-
-        try {
-          const res = await fetch(window.SUPABASE_FUNCTION_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'analyze',
-              payload: {
-                name: company.name,
-                category: company.category,
-                snippet: company.snippet
-              }
-            })
-          });
-
-          const data = await res.json();
-          if (data.error) throw new Error(data.error);
-
-          document.getElementById('ai-summary').innerText = data.result;
-        } catch (err) {
-          console.error(err);
-          document.getElementById('ai-summary').innerText = "Erro ao processar análise via Supabase.";
-        }
-      },
-
       async generateApproachWithAI() {
-        const company = window.state.companies.find(c => c.id === window.state.activeCompanyId);
+        const company = window.state.searchResults.find(c => c.id === window.state.activeCompanyId) || window.state.savedCompanies.find(c => c.id === window.state.activeCompanyId);
         const offering = document.getElementById('search-offering').value || "nossas soluções corporativas";
         document.getElementById('ai-message').value = "Escrevendo abordagem de alta conversão...";
 
@@ -447,77 +471,23 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'approach',
-              payload: {
-                name: company.name,
-                offering: offering
-              }
+              payload: { nome: company.nome, offering }
             })
           });
 
           const data = await res.json();
-          if (data.error) throw new Error(data.error);
-
           document.getElementById('ai-message').value = data.result;
         } catch (err) {
           console.error(err);
-          document.getElementById('ai-message').value = "Erro ao gerar abordagem via Supabase.";
+          document.getElementById('ai-message').value = "Erro ao gerar abordagem.";
         }
-      },
-
-      addCurrentToCRM() {
-        this.closeModal();
-        this.navigate('crm');
       },
 
       renderDashboard() {
-        const total = document.getElementById('stat-total');
-        if (!total) return;
-        total.innerText = window.state.companies.length;
-        document.getElementById('stat-qualifying').innerText = window.state.companies.filter(c => c.status === 'Novo' || c.status === 'Em Contato').length;
-        document.getElementById('stat-proposals').innerText = window.state.companies.filter(c => c.status === 'Reunião Agendada').length;
-        document.getElementById('stat-closed').innerText = window.state.companies.filter(c => c.status === 'Cliente Fechado').length;
-      },
-
-      renderKanban() {
-        const cols = { 'Novo': 'crm-col-novo', 'Em Contato': 'crm-col-contato', 'Reunião Agendada': 'crm-col-reuniao', 'Cliente Fechado': 'crm-col-fechado' };
-        
-        Object.keys(cols).forEach(k => {
-          const el = document.getElementById(cols[k]);
-          if (el) el.innerHTML = '';
-        });
-
-        window.state.companies.forEach(c => {
-          const colId = cols[c.status] || 'crm-col-novo';
-          const colEl = document.getElementById(colId);
-          if (!colEl) return;
-
-          const cardHtml = `
-            <div class="bg-surface-800 border border-slate-700 p-3 rounded-lg text-xs space-y-2">
-              <div class="font-bold text-white">${c.name}</div>
-              <div class="text-slate-400 text-[10px]">${c.category} • ${c.city}</div>
-              <div class="text-slate-300 text-[10px]"><i class="fa-solid fa-phone mr-1"></i>${c.phone || 'N/A'}</div>
-              <div class="flex justify-between items-center pt-2 border-t border-slate-700">
-                <select onchange="app.updateStatus('${c.id}', this.value)" class="bg-surface-900 border border-slate-700 text-slate-300 rounded px-1.5 py-0.5 text-[10px]">
-                  <option value="Novo" ${c.status === 'Novo' ? 'selected' : ''}>Novo</option>
-                  <option value="Em Contato" ${c.status === 'Em Contato' ? 'selected' : ''}>Em Contato</option>
-                  <option value="Reunião Agendada" ${c.status === 'Reunião Agendada' ? 'selected' : ''}>Reunião</option>
-                  <option value="Cliente Fechado" ${c.status === 'Cliente Fechado' ? 'selected' : ''}>Fechado</option>
-                </select>
-              </div>
-            </div>
-          `;
-          colEl.innerHTML += cardHtml;
-        });
-      },
-
-      updateStatus(id, newStatus) {
-        const company = window.state.companies.find(c => c.id === id);
-        if (company) {
-          company.status = newStatus;
-          localStorage.setItem('rp_companies', JSON.stringify(window.state.companies));
-          this.renderKanban();
-          this.renderDashboard();
-        }
+        const searched = document.getElementById('stat-searched');
+        const saved = document.getElementById('stat-saved');
+        if (searched) searched.innerText = window.state.searchResults.length;
+        if (saved) saved.innerText = window.state.savedCompanies.length;
       }
     };
   </script>
