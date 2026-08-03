@@ -147,13 +147,14 @@
                   <tr>
                     <th class="p-3">Empresa</th>
                     <th class="p-3">Cidade/Setor</th>
+                    <th class="p-3">Telefone / Contato</th>
                     <th class="p-3">Score IA</th>
                     <th class="p-3 text-right">Ação</th>
                   </tr>
                 </thead>
                 <tbody id="search-results-table" class="divide-y divide-slate-800 text-slate-300">
                   <tr>
-                    <td colspan="4" class="p-4 text-center text-slate-500">Nenhuma busca realizada ainda. Preencha os campos acima.</td>
+                    <td colspan="5" class="p-4 text-center text-slate-500">Nenhuma busca realizada ainda. Preencha os campos acima.</td>
                   </tr>
                 </tbody>
               </table>
@@ -201,9 +202,15 @@
         </div>
 
         <div class="space-y-3 text-xs">
-          <div class="flex items-center space-x-2 text-slate-300">
-            <i class="fa-solid fa-link w-4"></i>
-            <a id="modal-company-site" href="#" target="_blank" class="text-brand-500 hover:underline">---</a>
+          <div class="flex items-center space-x-4 text-slate-300">
+            <div>
+              <i class="fa-solid fa-link w-4 text-brand-500"></i>
+              <a id="modal-company-site" href="#" target="_blank" class="text-brand-500 hover:underline">---</a>
+            </div>
+            <div>
+              <i class="fa-solid fa-phone w-4 text-emerald-400"></i>
+              <span id="modal-company-phone" class="text-slate-200">---</span>
+            </div>
           </div>
 
           <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
@@ -327,6 +334,7 @@
             name: c.name,
             site: c.site,
             snippet: c.snippet,
+            phone: c.phone || 'Não informado',
             category: segment,
             city: city,
             score: c.score || Math.floor(Math.random() * 20) + 75,
@@ -353,20 +361,31 @@
         if (!tbody) return;
 
         if (window.state.companies.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa encontrada. Faça uma busca acima.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nenhuma empresa encontrada. Faça uma busca acima.</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = window.state.companies.map(c => `
-          <tr class="hover:bg-surface-800/50">
-            <td class="p-3 font-medium text-white">${c.name}</td>
-            <td class="p-3 text-slate-400">${c.category} em ${c.city}</td>
-            <td class="p-3"><span class="bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded text-xs font-bold">${c.score}/100</span></td>
-            <td class="p-3 text-right">
-              <button onclick="app.openModal('${c.id}')" class="bg-surface-800 hover:bg-surface-700 text-slate-200 px-3 py-1 rounded text-xs">Detalhes & IA</button>
-            </td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = window.state.companies.map(c => {
+          const cleanPhone = c.phone ? c.phone.replace(/\D/g, '') : '';
+          const whatsAppBtn = cleanPhone.length >= 10 
+            ? `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="ml-2 inline-flex items-center text-emerald-400 hover:text-emerald-300" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` 
+            : '';
+
+          return `
+            <tr class="hover:bg-surface-800/50">
+              <td class="p-3 font-medium text-white">${c.name}</td>
+              <td class="p-3 text-slate-400">${c.category} em ${c.city}</td>
+              <td class="p-3 text-slate-300">
+                <span class="inline-flex items-center"><i class="fa-solid fa-phone text-[10px] text-slate-500 mr-1.5"></i>${c.phone}</span>
+                ${whatsAppBtn}
+              </td>
+              <td class="p-3"><span class="bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded text-xs font-bold">${c.score}/100</span></td>
+              <td class="p-3 text-right">
+                <button onclick="app.openModal('${c.id}')" class="bg-surface-800 hover:bg-surface-700 text-slate-200 px-3 py-1 rounded text-xs">Detalhes & IA</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
       },
 
       openModal(id) {
@@ -378,6 +397,7 @@
         document.getElementById('modal-company-category').innerText = `${company.category} • ${company.city}`;
         document.getElementById('modal-company-site').innerText = company.site;
         document.getElementById('modal-company-site').href = company.site;
+        document.getElementById('modal-company-phone').innerText = company.phone || 'Não disponível';
         document.getElementById('ai-summary').innerText = "Clique no botão acima para analisar com a IA.";
         document.getElementById('ai-message').value = "";
 
@@ -475,6 +495,7 @@
             <div class="bg-surface-800 border border-slate-700 p-3 rounded-lg text-xs space-y-2">
               <div class="font-bold text-white">${c.name}</div>
               <div class="text-slate-400 text-[10px]">${c.category} • ${c.city}</div>
+              <div class="text-slate-300 text-[10px]"><i class="fa-solid fa-phone mr-1"></i>${c.phone || 'N/A'}</div>
               <div class="flex justify-between items-center pt-2 border-t border-slate-700">
                 <select onchange="app.updateStatus('${c.id}', this.value)" class="bg-surface-900 border border-slate-700 text-slate-300 rounded px-1.5 py-0.5 text-[10px]">
                   <option value="Novo" ${c.status === 'Novo' ? 'selected' : ''}>Novo</option>
