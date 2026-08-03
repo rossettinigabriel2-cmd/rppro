@@ -232,14 +232,14 @@
   </div>
 
   <script>
-    var SUPABASE_FUNCTION_URL = 'https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro';
+    window.SUPABASE_FUNCTION_URL = 'https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro';
 
-    const state = {
+    window.state = {
       companies: JSON.parse(localStorage.getItem('rp_companies')) || [],
       activeCompanyId: null
     };
 
-    const app = {
+    window.app = {
       init() {
         this.renderDashboard();
         this.renderSearchTable();
@@ -277,14 +277,15 @@
           activeNav.classList.remove('text-slate-400');
         }
       },
-async executeSearch(e) {
+
+      async executeSearch(e) {
         if (e) e.preventDefault();
         const offering = document.getElementById('search-offering').value;
         const segment = document.getElementById('search-segment').value;
         const city = document.getElementById('search-city').value;
         const btn = document.getElementById('btn-search-submit');
 
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Mapeando Mercado com IA...</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Mapeando Mercado...</span>`;
         btn.disabled = true;
 
         try {
@@ -297,12 +298,25 @@ async executeSearch(e) {
             })
           });
 
-          const data = await res.json();
-          
-          // Se o Supabase devolver um status de erro ou a propriedade error
-          if (!res.ok || data.error) {
-            const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : (data.error || 'Erro desconhecido na Function');
-            throw new Error(errorMsg);
+          const rawText = await res.text();
+
+          if (!res.ok) {
+            alert(`Erro na Edge Function (Status ${res.status}):\n\n${rawText}`);
+            return;
+          }
+
+          let data;
+          try {
+            data = JSON.parse(rawText);
+          } catch (err) {
+            alert(`Resposta inválida do servidor:\n\n${rawText}`);
+            return;
+          }
+
+          if (data.error) {
+            const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+            alert(`Erro retornado pela IA/Supabase:\n\n${errorMsg}`);
+            return;
           }
 
           const parsedContent = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
@@ -323,20 +337,8 @@ async executeSearch(e) {
           localStorage.setItem('rp_companies', JSON.stringify(window.state.companies));
 
         } catch (err) {
-          console.error('Erro detalhado:', err);
-          alert('Erro no Supabase/Groq:\n\n' + err.message);
-        } finally {
-          btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
-          btn.disabled = false;
-          this.renderSearchTable();
-          this.renderDashboard();
-          this.renderKanban();
-        }
-      },
-        } catch (err) {
-  console.error('Erro detalhado na requisição:', err);
-  alert('Erro retornado pelo servidor:\n' + JSON.stringify(err.message || err, null, 2));
-}
+          console.error('Erro na requisição:', err);
+          alert('Erro na conexão com a Edge Function.');
         } finally {
           btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
           btn.disabled = false;
@@ -350,12 +352,12 @@ async executeSearch(e) {
         const tbody = document.getElementById('search-results-table');
         if (!tbody) return;
 
-        if (state.companies.length === 0) {
+        if (window.state.companies.length === 0) {
           tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa encontrada. Faça uma busca acima.</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = state.companies.map(c => `
+        tbody.innerHTML = window.state.companies.map(c => `
           <tr class="hover:bg-surface-800/50">
             <td class="p-3 font-medium text-white">${c.name}</td>
             <td class="p-3 text-slate-400">${c.category} em ${c.city}</td>
@@ -368,9 +370,9 @@ async executeSearch(e) {
       },
 
       openModal(id) {
-        const company = state.companies.find(c => c.id === id);
+        const company = window.state.companies.find(c => c.id === id);
         if (!company) return;
-        state.activeCompanyId = id;
+        window.state.activeCompanyId = id;
 
         document.getElementById('modal-company-name').innerText = company.name;
         document.getElementById('modal-company-category').innerText = `${company.category} • ${company.city}`;
@@ -387,11 +389,11 @@ async executeSearch(e) {
       },
 
       async analyzeCompanyWithAI() {
-        const company = state.companies.find(c => c.id === state.activeCompanyId);
+        const company = window.state.companies.find(c => c.id === window.state.activeCompanyId);
         document.getElementById('ai-summary').innerText = "Analisando dados com IA...";
 
         try {
-          const res = await fetch(SUPABASE_FUNCTION_URL, {
+          const res = await fetch(window.SUPABASE_FUNCTION_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -415,12 +417,12 @@ async executeSearch(e) {
       },
 
       async generateApproachWithAI() {
-        const company = state.companies.find(c => c.id === state.activeCompanyId);
+        const company = window.state.companies.find(c => c.id === window.state.activeCompanyId);
         const offering = document.getElementById('search-offering').value || "nossas soluções corporativas";
         document.getElementById('ai-message').value = "Escrevendo abordagem de alta conversão...";
 
         try {
-          const res = await fetch(SUPABASE_FUNCTION_URL, {
+          const res = await fetch(window.SUPABASE_FUNCTION_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -450,10 +452,10 @@ async executeSearch(e) {
       renderDashboard() {
         const total = document.getElementById('stat-total');
         if (!total) return;
-        total.innerText = state.companies.length;
-        document.getElementById('stat-qualifying').innerText = state.companies.filter(c => c.status === 'Novo' || c.status === 'Em Contato').length;
-        document.getElementById('stat-proposals').innerText = state.companies.filter(c => c.status === 'Reunião Agendada').length;
-        document.getElementById('stat-closed').innerText = state.companies.filter(c => c.status === 'Cliente Fechado').length;
+        total.innerText = window.state.companies.length;
+        document.getElementById('stat-qualifying').innerText = window.state.companies.filter(c => c.status === 'Novo' || c.status === 'Em Contato').length;
+        document.getElementById('stat-proposals').innerText = window.state.companies.filter(c => c.status === 'Reunião Agendada').length;
+        document.getElementById('stat-closed').innerText = window.state.companies.filter(c => c.status === 'Cliente Fechado').length;
       },
 
       renderKanban() {
@@ -464,7 +466,7 @@ async executeSearch(e) {
           if (el) el.innerHTML = '';
         });
 
-        state.companies.forEach(c => {
+        window.state.companies.forEach(c => {
           const colId = cols[c.status] || 'crm-col-novo';
           const colEl = document.getElementById(colId);
           if (!colEl) return;
@@ -488,10 +490,10 @@ async executeSearch(e) {
       },
 
       updateStatus(id, newStatus) {
-        const company = state.companies.find(c => c.id === id);
+        const company = window.state.companies.find(c => c.id === id);
         if (company) {
           company.status = newStatus;
-          localStorage.setItem('rp_companies', JSON.stringify(state.companies));
+          localStorage.setItem('rp_companies', JSON.stringify(window.state.companies));
           this.renderKanban();
           this.renderDashboard();
         }
