@@ -3,13 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RP Prospect - Prospecção B2B</title>
-  <!-- Tailwind CSS via CDN (Produção-Ready para protótipos locais) -->
+  <title>RP Prospect - Prospecção B2B com IA & Google Maps</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Suprime o aviso do CDN do Tailwind no console para não poluir os logs
-    tailwind.config = { corePlugins: { preflight: true } }
-  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -81,7 +76,7 @@
       <div class="pt-6 border-t border-slate-800">
         <div class="flex items-center justify-between text-slate-400 text-xs mb-4">
           <span>Status do Sistema</span>
-          <span class="inline-flex items-center text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Standalone Ativo</span>
+          <span class="inline-flex items-center text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> Online</span>
         </div>
         <button onclick="fazerLogout()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs font-medium border border-slate-800 hover:border-rose-900/50 transition-all">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -97,7 +92,7 @@
       <section id="abaBuscar" class="space-y-6">
         <div>
           <h2 class="text-2xl font-bold text-white">Buscar Empresas Reais</h2>
-          <p class="text-slate-400 text-sm">Pesquisa e enriquecimento inteligente de leads B2B.</p>
+          <p class="text-slate-400 text-sm">Pesquisa em tempo real no Google Maps enriquecida com IA.</p>
         </div>
 
         <!-- FORMULÁRIO DE PESQUISA -->
@@ -141,7 +136,7 @@
         <!-- INDICADOR DE CARREGAMENTO -->
         <div id="searchLoading" class="hidden text-center py-12 space-y-3">
           <div class="inline-block w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-          <p class="text-slate-400 text-sm">Gerando mapa de prospecção comercial...</p>
+          <p class="text-slate-400 text-sm">Consultando Google Maps e gerando inteligência comercial...</p>
         </div>
 
         <!-- TABELA DE RESULTADOS -->
@@ -157,11 +152,12 @@
                 <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase text-slate-400">
                   <th class="p-4">Empresa / Setor</th>
                   <th class="p-4">Descrição</th>
-                  <th class="p-4">Contatos</th>
+                  <th class="p-4">Contatos Reais</th>
                   <th class="p-4 text-right">Ações & Envios</th>
                 </tr>
               </thead>
               <tbody id="searchResultsTable" class="divide-y divide-slate-800 text-sm">
+                <!-- Linhas preenchidas via JS -->
               </tbody>
             </table>
           </div>
@@ -199,6 +195,7 @@
                 </tr>
               </thead>
               <tbody id="savedResultsTable" class="divide-y divide-slate-800 text-sm">
+                <!-- Linhas salvas via JS -->
               </tbody>
             </table>
           </div>
@@ -213,7 +210,7 @@
       <section id="abaTemplate" class="hidden space-y-6">
         <div>
           <h2 class="text-2xl font-bold text-white">Template de Mensagem Padronizado</h2>
-          <p class="text-slate-400 text-sm">Defina a estrutura da mensagem base. O sistema aplicará as variáveis automaticamente.</p>
+          <p class="text-slate-400 text-sm">Defina a estrutura da mensagem base. A IA personalizará os dados de cada empresa automaticamente.</p>
         </div>
 
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
@@ -227,7 +224,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
           </div>
 
           <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
-            <h4 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Variáveis Disponíveis:</h4>
+            <h4 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Variáveis Disponíveis para Usar no Texto:</h4>
             <div class="flex flex-wrap gap-2 text-xs">
               <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{empresa}</code> Nome da Empresa</span>
               <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{setor}</code> Setor de Atuação</span>
@@ -238,7 +235,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
           <button onclick="salvarTemplate()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm flex items-center space-x-2">
             <i class="fa-solid fa-floppy-disk"></i>
-            <span>Salvar Template</span>
+            <span>Salvar Template Padronizado</span>
           </button>
         </div>
       </section>
@@ -246,7 +243,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     </main>
   </div>
 
-  <!-- MODAL DE DETALHES -->
+  <!-- MODAL DE DETALHES, DISPARO E GERADOR -->
   <div id="modalDetails" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
       
@@ -262,7 +259,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
       <div class="space-y-4">
         <div>
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descrição</h4>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descrição / Histórico</h4>
           <p id="modalDesc" class="text-sm text-slate-300 bg-slate-950 p-4 rounded-xl border border-slate-800">---</p>
         </div>
 
@@ -277,6 +274,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
           </div>
         </div>
 
+        <!-- CAIXA DA MENSAGEM -->
         <div class="space-y-2 pt-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-400 flex items-center space-x-1.5">
@@ -293,13 +291,16 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         </div>
       </div>
 
+      <!-- PAINEL DE DISPARO RÁPIDO -->
       <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <!-- Botão WhatsApp Direct -->
           <button onclick="enviarWhatsAppModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
             <i class="fa-brands fa-whatsapp text-base"></i>
             <span>Enviar WhatsApp</span>
           </button>
 
+          <!-- Botão E-mail Direct -->
           <button onclick="enviarEmailModal()" class="flex-1 sm:flex-none bg-sky-600 hover:bg-sky-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-lg shadow-sky-600/20">
             <i class="fa-solid fa-envelope text-base"></i>
             <span>Enviar E-mail</span>
@@ -314,7 +315,10 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     </div>
   </div>
 
+  <!-- LÓGICA JAVASCRIPT INTEGRADA -->
   <script>
+    const EDGE_FUNCTION_URL = "https://aomakxrtqvhbmsuwwqks.supabase.co/functions/v1/rppro";
+
     let buscaAtual = [];
     let empresasSalvas = [];
     let empresaSelecionadaModal = null;
@@ -364,9 +368,10 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       }
     }
 
-    function executarBusca() {
+    async function executarBusca() {
       const city = document.getElementById('searchCity').value;
       const segment = document.getElementById('searchSegment').value;
+      const offering = document.getElementById('searchOffering').value;
       const limit = parseInt(document.getElementById('searchLimit').value);
 
       if (!city || !segment) {
@@ -377,32 +382,28 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.getElementById('searchLoading').classList.remove('hidden');
       document.getElementById('resultsWrapper').classList.add('hidden');
 
-      // Gera os dados localmente sem nenhuma requisição HTTP/fetch
-      setTimeout(() => {
-        buscaAtual = [];
-        const prefixos = ['Grupo', 'Escritório', 'Consultoria', 'Centro', 'Soluções', 'Studio', 'Aliança', 'Prime', 'Vanguarda', 'Nexus'];
-        const sufixos = ['Associados', 'Especializados', 'Estratégicos', 'Integrados', 'Excelência', 'Digital', 'Parceiros'];
+      try {
+        const response = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'search',
+            payload: { city, segment, offering, limit }
+          })
+        });
 
-        for (let i = 0; i < limit; i++) {
-          const p = prefixos[Math.floor(Math.random() * prefixos.length)];
-          const s = sufixos[Math.floor(Math.random() * sufixos.length)];
-          const nomeEmpresa = `${p} ${segment} ${s}`;
-          const tel = `11 9${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
 
-          buscaAtual.push({
-            nome: nomeEmpresa,
-            setor: segment,
-            cidade: city,
-            descricao: `Empresa referência em ${segment} situada em ${city}. Possui estrutura completa de atendimento.`,
-            telefones: [{ telefone: tel }],
-            whatsapp: tel,
-            site: `https://www.${nomeEmpresa.toLowerCase().replace(/[^a-z0-9]/g, '')}.com.br`
-          });
-        }
+        let parsed = JSON.parse(data.result);
+        buscaAtual = parsed.companies || [];
 
         renderizarTabelaBusca();
+      } catch (err) {
+        alert('Erro ao buscar empresas: ' + err.message);
+      } finally {
         document.getElementById('searchLoading').classList.add('hidden');
-      }, 500);
+      }
     }
 
     function renderizarTabelaBusca() {
@@ -414,7 +415,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       } else {
         buscaAtual.forEach((empresa, idx) => {
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
-          const numWhatsapp = empresa.whatsapp || telPrincipal;
+          const numWhatsapp = empresa.whatsapp || (telPrincipal !== 'Não informado' ? telPrincipal : '');
 
           tbody.innerHTML += `
             <tr class="hover:bg-slate-900/50 transition-all">
@@ -425,15 +426,19 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
               <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
               <td class="p-4 text-slate-200">${telPrincipal}</td>
               <td class="p-4 text-right space-x-1.5">
+                <!-- Botão Enviar Wpp Direto -->
                 <button onclick="dispararWhatsAppDireto('${numWhatsapp}', '${empresa.nome}')" class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all" title="Abrir no WhatsApp">
                   <i class="fa-brands fa-whatsapp"></i>
                 </button>
+                <!-- Botão Enviar E-mail Direto -->
                 <button onclick="dispararEmailDireto('${empresa.nome}')" class="bg-sky-600/20 hover:bg-sky-600/40 text-sky-400 border border-sky-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all" title="Enviar E-mail">
                   <i class="fa-solid fa-envelope"></i>
                 </button>
+                <!-- Botão Guardar -->
                 <button onclick="guardarEmpresa(${idx})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition-all">
                   Guardar
                 </button>
+                <!-- Botão Detalhes -->
                 <button onclick="abrirModal(${idx}, 'busca')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
                   Detalhes
                 </button>
@@ -460,9 +465,9 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       if (!existe) {
         empresasSalvas.push(item);
         atualizarTabelaSalvas();
-        alert(`"${item.nome}" foi guardada com sucesso!`);
+        alert(`"${item.nome}" foi guardada na sua carteira CRM!`);
       } else {
-        alert('Esta empresa já está salva.');
+        alert('Esta empresa já está na sua lista de salvas.');
       }
     }
 
@@ -484,7 +489,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         emptyState.classList.add('hidden');
         empresasSalvas.forEach((empresa, idx) => {
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
-          const numWhatsapp = empresa.whatsapp || telPrincipal;
+          const numWhatsapp = empresa.whatsapp || (telPrincipal !== 'Não informado' ? telPrincipal : '');
 
           tbody.innerHTML += `
             <tr class="hover:bg-slate-900/50 transition-all">
@@ -513,6 +518,8 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         });
       }
     }
+
+    // DISPARO DE MENSAGENS E ATALHOS
 
     function gerarTextoMensagem(nomeEmpresa, setorEmpresa) {
       const city = document.getElementById('searchCity').value || 'sua cidade';
@@ -551,7 +558,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       if (numClean) {
         window.open(`https://wa.me/55${numClean}?text=${msg}`, '_blank');
       } else {
-        alert('Não há telefone cadastrado.');
+        alert('Não há telefone cadastrado para esta empresa.');
       }
     }
 
@@ -562,9 +569,10 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       window.open(`mailto:?subject=${assunto}&body=${msg}`, '_self');
     }
 
+    // EXPORTAÇÕES CRM & EXCEL
     function exportarCSV() {
       if (empresasSalvas.length === 0) {
-        alert('Sua carteira está vazia.');
+        alert('Sua carteira de empresas salvas está vazia.');
         return;
       }
 
@@ -583,7 +591,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `leads_rp_prospect.csv`);
+      link.setAttribute('download', `leads_rp_prospect_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -591,10 +599,11 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
     function exportarCRM(crmTipo) {
       if (empresasSalvas.length === 0) {
-        alert('Guarde algumas empresas primeiro.');
+        alert('Guarde algumas empresas antes de exportar para o CRM.');
         return;
       }
 
+      // Formato padrão universal compatível com HubSpot, Pipefy, RD Station e Salesforce
       let csv = '\uFEFF';
       csv += 'Company Name;Industry;Phone Number;Website;Notes/Description\n';
 
@@ -610,16 +619,17 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `import_crm_${crmTipo}.csv`);
+      link.setAttribute('download', `import_crm_${crmTipo}_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
     function salvarTemplate() {
-      alert('Template salvo!');
+      alert('Template padronizado salvo com sucesso!');
     }
 
+    // MODAL
     function abrirModal(index, origem) {
       empresaSelecionadaModal = origem === 'busca' ? buscaAtual[index] : empresasSalvas[index];
 
