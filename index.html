@@ -27,7 +27,7 @@
       <div class="w-full max-w-md bg-surface-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
         <div class="text-center space-y-2">
           <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600/20 text-brand-500 mb-2">
-            <i class="fa-solid me-0 fa-chart-line text-2xl"></i>
+            <i class="fa-solid fa-chart-line text-2xl"></i>
           </div>
           <h1 class="text-2xl font-bold tracking-tight text-white">RP Prospect</h1>
           <p class="text-xs text-slate-400">Motor de Busca & Copiloto IA B2B</p>
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <!-- Main Layout (Dashboard / Search / CRM) -->
+    <!-- Main Layout -->
     <div id="screen-main" class="hidden flex-1 flex flex-col md:flex-row overflow-hidden">
       <!-- Sidebar -->
       <aside class="w-full md:w-64 bg-surface-900 border-r border-slate-800 flex flex-col justify-between p-4">
@@ -80,9 +80,8 @@
         </div>
       </aside>
 
-      <!-- Main Content Area -->
+      <!-- Main Content -->
       <main class="flex-1 flex flex-col overflow-y-auto bg-surface-950 p-6 space-y-6">
-        
         <!-- View: Dashboard -->
         <div id="view-dashboard" class="space-y-6">
           <header class="flex justify-between items-center">
@@ -116,8 +115,8 @@
         <!-- View: Search -->
         <div id="view-search" class="hidden space-y-6">
           <div>
-            <h2 class="text-xl font-bold text-white">Busca de Leads em Tempo Real</h2>
-            <p class="text-xs text-slate-400">Extraia empresas diretamente do Google e analise com IA</p>
+            <h2 class="text-xl font-bold text-white">Busca de Leads com IA</h2>
+            <p class="text-xs text-slate-400">Mapeie empresas reais e crie abordagens com IA</p>
           </div>
 
           <form onsubmit="app.executeSearch(event)" class="bg-surface-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -141,7 +140,6 @@
             </div>
           </form>
 
-          <!-- Search Results Table -->
           <div class="bg-surface-900 border border-slate-800 rounded-xl overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
@@ -191,7 +189,7 @@
       </main>
     </div>
 
-    <!-- Company Detail Modal -->
+    <!-- Modal -->
     <div id="modal-company" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="bg-surface-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4">
         <div class="flex justify-between items-start border-b border-slate-800 pb-3">
@@ -234,8 +232,6 @@
   </div>
 
   <script>
-    // CHAVES DE API INTEGRADAS
-    const SCRAPE_DO_KEY = '072f58f5636644c0bb1e3e1529e368b4fec522d2223';
     const OPENAI_API_KEY = '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';
 
     const state = {
@@ -276,7 +272,7 @@
         activeNav.classList.remove('text-slate-400');
       },
 
-     async executeSearch(e) {
+      async executeSearch(e) {
         e.preventDefault();
         const offering = document.getElementById('search-offering').value;
         const segment = document.getElementById('search-segment').value;
@@ -312,8 +308,6 @@
 
           const data = await res.json();
           let content = data.choices[0].message.content.trim();
-          
-          // Limpa formatação markdown de código caso a IA adicione
           content = content.replace(/```json/g, '').replace(/```/g, '').trim();
 
           const fetchedCompanies = JSON.parse(content);
@@ -334,25 +328,7 @@
 
         } catch (err) {
           console.error('Erro na API:', err);
-          alert('Ocorreu um erro ao conectar com o motor de inteligência comercial.');
-        } finally {
-          btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
-          btn.disabled = false;
-          this.renderSearchTable();
-          this.renderDashboard();
-          this.renderKanban();
-        }
-      },
-          if (fetchedCompanies.length > 0) {
-            state.companies = [...fetchedCompanies, ...state.companies];
-            localStorage.setItem('rp_companies', JSON.stringify(state.companies));
-          } else {
-            alert('A busca não retornou novos resultados formatados. Tente ajustar os termos.');
-          }
-
-        } catch (err) {
-          console.error('Erro na API:', err);
-          alert('Erro ao buscar dados. Verifique a conexão com as APIs.');
+          alert('Ocorreu um erro ao conectar com a IA.');
         } finally {
           btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
           btn.disabled = false;
