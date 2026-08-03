@@ -41,7 +41,7 @@
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Senha</label>
             <input type="password" value="••••••••" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500" required>
           </div>
-          <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200">
+          <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200 cursor-pointer">
             Entrar no Sistema
           </button>
         </form>
@@ -232,10 +232,7 @@
   </div>
 
   <script>
-    
-    const SUPABASE_FUNCTION_URL = 'sb_publishable_DCjTIYmEzvxvF5yqMKRX8A_xdoAo9yt';
-   
-    const SUPABASE_FUNCTION_URL = 'https://SEU-PROJETO.supabase.co/functions/v1/prospect-ai';
+    const SUPABASE_FUNCTION_URL = 'https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro';
 
     const state = {
       companies: JSON.parse(localStorage.getItem('rp_companies')) || [],
@@ -250,7 +247,7 @@
       },
 
       login(e) {
-        e.preventDefault();
+        if (e) e.preventDefault();
         document.getElementById('screen-login').classList.add('hidden');
         document.getElementById('screen-main').classList.remove('hidden');
         this.init();
@@ -263,20 +260,26 @@
 
       navigate(view) {
         ['dashboard', 'search', 'crm'].forEach(v => {
-          document.getElementById(`view-${v}`).classList.add('hidden');
+          const viewEl = document.getElementById(`view-${v}`);
           const navBtn = document.getElementById(`nav-${v}`);
-          navBtn.classList.remove('bg-brand-600/10', 'text-brand-500');
-          navBtn.classList.add('text-slate-400');
+          if (viewEl) viewEl.classList.add('hidden');
+          if (navBtn) {
+            navBtn.classList.remove('bg-brand-600/10', 'text-brand-500');
+            navBtn.classList.add('text-slate-400');
+          }
         });
 
-        document.getElementById(`view-${view}`).classList.remove('hidden');
+        const activeView = document.getElementById(`view-${view}`);
         const activeNav = document.getElementById(`nav-${view}`);
-        activeNav.classList.add('bg-brand-600/10', 'text-brand-500');
-        activeNav.classList.remove('text-slate-400');
+        if (activeView) activeView.classList.remove('hidden');
+        if (activeNav) {
+          activeNav.classList.add('bg-brand-600/10', 'text-brand-500');
+          activeNav.classList.remove('text-slate-400');
+        }
       },
 
       async executeSearch(e) {
-        e.preventDefault();
+        if (e) e.preventDefault();
         const offering = document.getElementById('search-offering').value;
         const segment = document.getElementById('search-segment').value;
         const city = document.getElementById('search-city').value;
@@ -298,7 +301,7 @@
           const data = await res.json();
           if (data.error) throw new Error(data.error);
 
-          const parsedContent = JSON.parse(data.result);
+          const parsedContent = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
           const fetchedCompanies = parsedContent.companies || [];
 
           const formattedCompanies = fetchedCompanies.map((c, i) => ({
@@ -316,8 +319,8 @@
           localStorage.setItem('rp_companies', JSON.stringify(state.companies));
 
         } catch (err) {
-          console.error('Erro na requisição Supabase:', err);
-          alert('Ocorreu um erro ao conectar com o servidor do Supabase.');
+          console.error('Erro na requisição:', err);
+          alert('Ocorreu um erro ao buscar dados no Supabase/Groq.');
         } finally {
           btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
           btn.disabled = false;
@@ -329,6 +332,8 @@
 
       renderSearchTable() {
         const tbody = document.getElementById('search-results-table');
+        if (!tbody) return;
+
         if (state.companies.length === 0) {
           tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa encontrada. Faça uma busca acima.</td></tr>`;
           return;
@@ -427,7 +432,9 @@
       },
 
       renderDashboard() {
-        document.getElementById('stat-total').innerText = state.companies.length;
+        const total = document.getElementById('stat-total');
+        if (!total) return;
+        total.innerText = state.companies.length;
         document.getElementById('stat-qualifying').innerText = state.companies.filter(c => c.status === 'Novo' || c.status === 'Em Contato').length;
         document.getElementById('stat-proposals').innerText = state.companies.filter(c => c.status === 'Reunião Agendada').length;
         document.getElementById('stat-closed').innerText = state.companies.filter(c => c.status === 'Cliente Fechado').length;
@@ -436,10 +443,16 @@
       renderKanban() {
         const cols = { 'Novo': 'crm-col-novo', 'Em Contato': 'crm-col-contato', 'Reunião Agendada': 'crm-col-reuniao', 'Cliente Fechado': 'crm-col-fechado' };
         
-        Object.keys(cols).forEach(k => document.getElementById(cols[k]).innerHTML = '');
+        Object.keys(cols).forEach(k => {
+          const el = document.getElementById(cols[k]);
+          if (el) el.innerHTML = '';
+        });
 
         state.companies.forEach(c => {
           const colId = cols[c.status] || 'crm-col-novo';
+          const colEl = document.getElementById(colId);
+          if (!colEl) return;
+
           const cardHtml = `
             <div class="bg-surface-800 border border-slate-700 p-3 rounded-lg text-xs space-y-2">
               <div class="font-bold text-white">${c.name}</div>
@@ -454,7 +467,7 @@
               </div>
             </div>
           `;
-          document.getElementById(colId).innerHTML += cardHtml;
+          colEl.innerHTML += cardHtml;
         });
       },
 
