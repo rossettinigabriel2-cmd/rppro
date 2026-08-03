@@ -9,16 +9,10 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row">
 
-  <!-- TELAS DO SISTEMA -->
-  
   <!-- 1. TELA DE LOGIN -->
   <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
     <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
@@ -159,7 +153,7 @@
                   <th class="p-4">Empresa / Setor</th>
                   <th class="p-4">Descrição</th>
                   <th class="p-4">Contatos Reais</th>
-                  <th class="p-4 text-right">Ações</th>
+                  <th class="p-4 text-right">Ações & Envios</th>
                 </tr>
               </thead>
               <tbody id="searchResultsTable" class="divide-y divide-slate-800 text-sm">
@@ -170,17 +164,23 @@
         </div>
       </section>
 
-      <!-- ABA 2: EMPRESAS SALVAS -->
+      <!-- ABA 2: EMPRESAS SALVAS / CRM -->
       <section id="abaSalvas" class="hidden space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-2xl font-bold text-white">Empresas Salvas (Carteira)</h2>
-            <p class="text-slate-400 text-sm">Seus leads guardados para prospecção direta.</p>
+            <h2 class="text-2xl font-bold text-white">Empresas Salvas (Carteira CRM)</h2>
+            <p class="text-slate-400 text-sm">Seus leads guardados para prospecção e exportação para CRM.</p>
           </div>
-          <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm shadow-lg shadow-emerald-600/20">
-            <i class="fa-solid fa-file-excel"></i>
-            <span>Exportar para CSV / Excel</span>
-          </button>
+          <div class="flex items-center space-x-3">
+            <button onclick="exportarCRM('hubspot')" class="bg-orange-600 hover:bg-orange-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-xs shadow-lg shadow-orange-600/20">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span>Exportar p/ CRM (HubSpot/Pipefy)</span>
+            </button>
+            <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-xs shadow-lg shadow-emerald-600/20">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Exportar Excel (CSV)</span>
+            </button>
+          </div>
         </div>
 
         <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
@@ -191,7 +191,7 @@
                   <th class="p-4">Empresa / Setor</th>
                   <th class="p-4">Descrição</th>
                   <th class="p-4">Contatos</th>
-                  <th class="p-4 text-right">Ações</th>
+                  <th class="p-4 text-right">Ações & Envios</th>
                 </tr>
               </thead>
               <tbody id="savedResultsTable" class="divide-y divide-slate-800 text-sm">
@@ -243,7 +243,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     </main>
   </div>
 
-  <!-- MODAL DE DETALHES & GERADOR DE ABORDAGEM -->
+  <!-- MODAL DE DETALHES, DISPARO E GERADOR -->
   <div id="modalDetails" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
       
@@ -274,34 +274,40 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
           </div>
         </div>
 
-        <!-- MENSAGEM GERADA -->
+        <!-- CAIXA DA MENSAGEM -->
         <div class="space-y-2 pt-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-400 flex items-center space-x-1.5">
               <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span>Mensagem de Prospecção Adaptada</span>
+              <span>Mensagem Personalizada</span>
             </h4>
             <button onclick="copiarMensagem()" id="btnCopyMsg" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center space-x-1.5">
               <i class="fa-regular fa-copy"></i>
               <span id="copyMsgText">Copiar Mensagem</span>
             </button>
           </div>
-          
-          <div id="modalMsgLoading" class="hidden text-center py-6">
-            <div class="inline-block w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-            <p class="text-xs text-slate-400 mt-2">Personalizando modelo com inteligência artificial...</p>
-          </div>
 
           <textarea id="modalMsgText" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
       </div>
 
-      <div class="flex justify-between items-center border-t border-slate-800 pt-4">
-        <a id="modalWhatsappBtn" href="#" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all items-center space-x-2">
-          <i class="fa-brands fa-whatsapp text-lg"></i>
-          <span>Abrir no WhatsApp</span>
-        </a>
-        <button onclick="fecharModal()" class="ml-auto bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-5 py-2.5 rounded-xl text-sm transition-all">
+      <!-- PAINEL DE DISPARO RÁPIDO -->
+      <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <!-- Botão WhatsApp Direct -->
+          <button onclick="enviarWhatsAppModal()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
+            <i class="fa-brands fa-whatsapp text-base"></i>
+            <span>Enviar WhatsApp</span>
+          </button>
+
+          <!-- Botão E-mail Direct -->
+          <button onclick="enviarEmailModal()" class="flex-1 sm:flex-none bg-sky-600 hover:bg-sky-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-lg shadow-sky-600/20">
+            <i class="fa-solid fa-envelope text-base"></i>
+            <span>Enviar E-mail</span>
+          </button>
+        </div>
+
+        <button onclick="fecharModal()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-5 py-2.5 rounded-xl text-xs transition-all">
           Fechar
         </button>
       </div>
@@ -309,23 +315,18 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     </div>
   </div>
 
-
   <!-- LÓGICA JAVASCRIPT INTEGRADA -->
   <script>
-    // CONFIGURAÇÃO SUPABASE EDGE FUNCTION
     const EDGE_FUNCTION_URL = "https://aomakxrtqvhbmsuwwqks.supabase.co/functions/v1/rppro";
 
-    // ESTADO DA APLICAÇÃO (MEMÓRIA)
     let buscaAtual = [];
     let empresasSalvas = [];
     let empresaSelecionadaModal = null;
 
-    // INICIALIZAÇÃO
     window.addEventListener('DOMContentLoaded', () => {
       atualizarTabelaSalvas();
     });
 
-    // SISTEMA DE AUTENTICAÇÃO SIMPLES
     function fazerLogin() {
       const email = document.getElementById('loginEmail').value;
       const senha = document.getElementById('loginSenha').value;
@@ -346,7 +347,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.getElementById('loginSection').classList.remove('hidden');
     }
 
-    // NAVEGAÇÃO DE ABAS
     function mudarAba(aba) {
       document.getElementById('abaBuscar').classList.add('hidden');
       document.getElementById('abaSalvas').classList.add('hidden');
@@ -368,7 +368,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       }
     }
 
-    // BUSCA DE LEADS NA EDGE FUNCTION
     async function executarBusca() {
       const city = document.getElementById('searchCity').value;
       const segment = document.getElementById('searchSegment').value;
@@ -394,7 +393,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         });
 
         const data = await response.json();
-        
         if (data.error) throw new Error(data.error);
 
         let parsed = JSON.parse(data.result);
@@ -413,11 +411,11 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       tbody.innerHTML = '';
 
       if (buscaAtual.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">Nenhuma empresa encontrada para esta pesquisa.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">Nenhuma empresa encontrada.</td></tr>`;
       } else {
         buscaAtual.forEach((empresa, idx) => {
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
-          const temTel = telPrincipal !== 'Não informado';
+          const numWhatsapp = empresa.whatsapp || (telPrincipal !== 'Não informado' ? telPrincipal : '');
 
           tbody.innerHTML += `
             <tr class="hover:bg-slate-900/50 transition-all">
@@ -426,16 +424,21 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
                 <div class="text-xs text-indigo-400">${empresa.setor || 'Geral'}</div>
               </td>
               <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
-              <td class="p-4">
-                <div class="flex items-center space-x-2">
-                  <span class="${temTel ? 'text-slate-200' : 'text-slate-500 font-italic'}">${telPrincipal}</span>
-                  ${empresa.whatsapp ? '<i class="fa-brands fa-whatsapp text-emerald-400" title="WhatsApp disponível"></i>' : ''}
-                </div>
-              </td>
-              <td class="p-4 text-right space-x-2">
-                <button onclick="guardarEmpresa(${idx})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition-all">
+              <td class="p-4 text-slate-200">${telPrincipal}</td>
+              <td class="p-4 text-right space-x-1.5">
+                <!-- Botão Enviar Wpp Direto -->
+                <button onclick="dispararWhatsAppDireto('${numWhatsapp}', '${empresa.nome}')" class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all" title="Abrir no WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <!-- Botão Enviar E-mail Direto -->
+                <button onclick="dispararEmailDireto('${empresa.nome}')" class="bg-sky-600/20 hover:bg-sky-600/40 text-sky-400 border border-sky-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all" title="Enviar E-mail">
+                  <i class="fa-solid fa-envelope"></i>
+                </button>
+                <!-- Botão Guardar -->
+                <button onclick="guardarEmpresa(${idx})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition-all">
                   Guardar
                 </button>
+                <!-- Botão Detalhes -->
                 <button onclick="abrirModal(${idx}, 'busca')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
                   Detalhes
                 </button>
@@ -455,7 +458,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.getElementById('resultsWrapper').classList.add('hidden');
     }
 
-    // CARTEIRA / EMPRESAS SALVAS
     function guardarEmpresa(index) {
       const item = buscaAtual[index];
       const existe = empresasSalvas.some(e => e.nome === item.nome);
@@ -463,7 +465,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       if (!existe) {
         empresasSalvas.push(item);
         atualizarTabelaSalvas();
-        alert(`"${item.nome}" foi guardada na sua carteira!`);
+        alert(`"${item.nome}" foi guardada na sua carteira CRM!`);
       } else {
         alert('Esta empresa já está na sua lista de salvas.');
       }
@@ -487,6 +489,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         emptyState.classList.add('hidden');
         empresasSalvas.forEach((empresa, idx) => {
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
+          const numWhatsapp = empresa.whatsapp || (telPrincipal !== 'Não informado' ? telPrincipal : '');
 
           tbody.innerHTML += `
             <tr class="hover:bg-slate-900/50 transition-all">
@@ -496,8 +499,14 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
               </td>
               <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
               <td class="p-4 text-slate-200">${telPrincipal}</td>
-              <td class="p-4 text-right space-x-2">
-                <button onclick="removerSalva(${idx})" class="bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition-all">
+              <td class="p-4 text-right space-x-1.5">
+                <button onclick="dispararWhatsAppDireto('${numWhatsapp}', '${empresa.nome}')" class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all" title="Abrir no WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="dispararEmailDireto('${empresa.nome}')" class="bg-sky-600/20 hover:bg-sky-600/40 text-sky-400 border border-sky-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all" title="Enviar E-mail">
+                  <i class="fa-solid fa-envelope"></i>
+                </button>
+                <button onclick="removerSalva(${idx})" class="bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition-all">
                   Remover
                 </button>
                 <button onclick="abrirModal(${idx}, 'salvas')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
@@ -510,14 +519,64 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       }
     }
 
-    // EXPORTAR PARA CSV / EXCEL
+    // DISPARO DE MENSAGENS E ATALHOS
+
+    function gerarTextoMensagem(nomeEmpresa, setorEmpresa) {
+      const city = document.getElementById('searchCity').value || 'sua cidade';
+      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
+      const templateBase = document.getElementById('templateText').value;
+
+      return templateBase
+        .replace(/{empresa}/g, nomeEmpresa)
+        .replace(/{setor}/g, setorEmpresa || 'seu segmento')
+        .replace(/{cidade}/g, city)
+        .replace(/{proposta}/g, offering);
+    }
+
+    function dispararWhatsAppDireto(telefone, nomeEmpresa) {
+      if (!telefone || telefone === 'Não informado') {
+        alert('Empresa sem telefone cadastrado.');
+        return;
+      }
+      const numClean = telefone.replace(/\D/g, '');
+      const texto = encodeURIComponent(gerarTextoMensagem(nomeEmpresa, ''));
+      window.open(`https://wa.me/55${numClean}?text=${texto}`, '_blank');
+    }
+
+    function dispararEmailDireto(nomeEmpresa) {
+      const assunto = encodeURIComponent(`Oportunidade Comercial - ${nomeEmpresa}`);
+      const texto = encodeURIComponent(gerarTextoMensagem(nomeEmpresa, ''));
+      window.open(`mailto:?subject=${assunto}&body=${texto}`, '_self');
+    }
+
+    function enviarWhatsAppModal() {
+      if (!empresaSelecionadaModal) return;
+      const tel = empresaSelecionadaModal.whatsapp || (empresaSelecionadaModal.telefones?.[0]?.telefone || '');
+      const numClean = tel.replace(/\D/g, '');
+      const msg = encodeURIComponent(document.getElementById('modalMsgText').value);
+      
+      if (numClean) {
+        window.open(`https://wa.me/55${numClean}?text=${msg}`, '_blank');
+      } else {
+        alert('Não há telefone cadastrado para esta empresa.');
+      }
+    }
+
+    function enviarEmailModal() {
+      if (!empresaSelecionadaModal) return;
+      const assunto = encodeURIComponent(`Proposta Comercial - ${empresaSelecionadaModal.nome}`);
+      const msg = encodeURIComponent(document.getElementById('modalMsgText').value);
+      window.open(`mailto:?subject=${assunto}&body=${msg}`, '_self');
+    }
+
+    // EXPORTAÇÕES CRM & EXCEL
     function exportarCSV() {
       if (empresasSalvas.length === 0) {
-        alert('Sua lista de empresas salvas está vazia.');
+        alert('Sua carteira de empresas salvas está vazia.');
         return;
       }
 
-      let csv = '\uFEFF'; // UTF-8 BOM para abrir acentos corretamente no Excel
+      let csv = '\uFEFF';
       csv += 'Nome;Setor;Telefone;Site;Descricao\n';
 
       empresasSalvas.forEach(e => {
@@ -538,13 +597,40 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.body.removeChild(link);
     }
 
-    // GERENCIAMENTO DE TEMPLATES
-    function salvarTemplate() {
-      alert('Template de mensagem salvo com sucesso!');
+    function exportarCRM(crmTipo) {
+      if (empresasSalvas.length === 0) {
+        alert('Guarde algumas empresas antes de exportar para o CRM.');
+        return;
+      }
+
+      // Formato padrão universal compatível com HubSpot, Pipefy, RD Station e Salesforce
+      let csv = '\uFEFF';
+      csv += 'Company Name;Industry;Phone Number;Website;Notes/Description\n';
+
+      empresasSalvas.forEach(e => {
+        const tel = (e.telefones && e.telefones.length > 0) ? e.telefones[0].telefone : '';
+        const site = e.site || '';
+        const desc = (e.descricao || '').replace(/;/g, ' ');
+
+        csv += `"${e.nome}";"${e.setor}";"${tel}";"${site}";"${desc}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `import_crm_${crmTipo}_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
-    // MODAL DE DETALHES E IA
-    async function abrirModal(index, origem) {
+    function salvarTemplate() {
+      alert('Template padronizado salvo com sucesso!');
+    }
+
+    // MODAL
+    function abrirModal(index, origem) {
       empresaSelecionadaModal = origem === 'busca' ? buscaAtual[index] : empresasSalvas[index];
 
       document.getElementById('modalTitle').innerText = empresaSelecionadaModal.nome;
@@ -563,31 +649,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         siteElem.innerText = 'Não informado';
       }
 
-      // WhatsApp Btn
-      const waBtn = document.getElementById('modalWhatsappBtn');
-      if (empresaSelecionadaModal.whatsapp) {
-        const numClean = empresaSelecionadaModal.whatsapp.replace(/\D/g, '');
-        waBtn.href = `https://wa.me/${numClean}`;
-        waBtn.classList.remove('hidden');
-        waBtn.classList.add('flex');
-      } else {
-        waBtn.classList.add('hidden');
-        waBtn.classList.remove('flex');
-      }
-
-      // Gerar mensagem com base no Template e dados da empresa
-      const city = document.getElementById('searchCity').value || 'sua cidade';
-      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
-      const templateBase = document.getElementById('templateText').value;
-
-      // Substituição direta das variáveis no modelo
-      let mensagemFormatada = templateBase
-        .replace(/{empresa}/g, empresaSelecionadaModal.nome)
-        .replace(/{setor}/g, empresaSelecionadaModal.setor || 'seu segmento')
-        .replace(/{cidade}/g, city)
-        .replace(/{proposta}/g, offering);
-
-      document.getElementById('modalMsgText').value = mensagemFormatada;
+      document.getElementById('modalMsgText').value = gerarTextoMensagem(empresaSelecionadaModal.nome, empresaSelecionadaModal.setor);
       document.getElementById('modalDetails').classList.remove('hidden');
     }
 
