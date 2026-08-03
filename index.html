@@ -289,7 +289,7 @@
         try {
           const query = encodeURIComponent(`empresas de ${segment} em ${city}`);
           const googleUrl = `https://www.google.com/search?q=${query}`;
-          const proxyUrl = `https://api.scrape.do?token=${SCRAPE_DO_KEY}&url=${encodeURIComponent(googleUrl)}`;
+         const proxyUrl = `https://api.scrape.do?token=${SCRAPE_DO_KEY}&render=true&url=${encodeURIComponent(googleUrl)}`;
 
           const res = await fetch(proxyUrl);
           const html = await res.text();
