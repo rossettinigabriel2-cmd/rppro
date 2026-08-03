@@ -319,8 +319,9 @@
           localStorage.setItem('rp_companies', JSON.stringify(state.companies));
 
         } catch (err) {
-          console.error('Erro na requisição:', err);
-          alert('Ocorreu um erro ao buscar dados no Supabase/Groq.');
+  console.error('Erro detalhado na requisição:', err);
+  alert('Erro retornado pelo servidor:\n' + JSON.stringify(err.message || err, null, 2));
+}
         } finally {
           btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
           btn.disabled = false;
