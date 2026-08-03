@@ -276,49 +276,73 @@
         activeNav.classList.remove('text-slate-400');
       },
 
-      async executeSearch(e) {
+     async executeSearch(e) {
         e.preventDefault();
         const offering = document.getElementById('search-offering').value;
         const segment = document.getElementById('search-segment').value;
         const city = document.getElementById('search-city').value;
         const btn = document.getElementById('btn-search-submit');
 
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Buscando no Google...</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Mapeando Mercado com IA...</span>`;
         btn.disabled = true;
 
+        const prompt = `Atue como um motor de busca comercial B2B. Liste 5 empresas reais existentes na cidade de ${city} do segmento de ${segment}. 
+        Retorne EXATAMENTE um array em formato JSON puro (sem marcação markdown, sem textos antes ou depois) no seguinte formato:
+        [
+          {
+            "name": "Nome Real da Empresa",
+            "site": "https://site-da-empresa.com.br",
+            "snippet": "Descrição sucinta do foco de atuação da empresa.",
+            "score": 88
+          }
+        ]`;
+
         try {
-          const query = encodeURIComponent(`empresas de ${segment} em ${city}`);
-          const googleUrl = `https://www.google.com/search?q=${query}`;
-         const proxyUrl = `https://api.scrape.do?token=${SCRAPE_DO_KEY}&render=true&url=${encodeURIComponent(googleUrl)}`;
-
-          const res = await fetch(proxyUrl);
-          const html = await res.text();
-          
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const cards = doc.querySelectorAll('div.g');
-          
-          const fetchedCompanies = [];
-          cards.forEach((card, i) => {
-            if (i >= 6) return;
-            const titleEl = card.querySelector('h3');
-            const linkEl = card.querySelector('a');
-            const snippetEl = card.querySelector('.VwiC3b') || card.querySelector('.st');
-
-            if (titleEl && linkEl) {
-              fetchedCompanies.push({
-                id: `real-${Date.now()}-${i}`,
-                name: titleEl.innerText,
-                site: linkEl.href,
-                snippet: snippetEl ? snippetEl.innerText : '',
-                category: segment,
-                city: city,
-                score: Math.floor(Math.random() * 20) + 75,
-                status: 'Novo'
-              });
-            }
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [{ role: 'user', content: prompt }]
+            })
           });
 
+          const data = await res.json();
+          let content = data.choices[0].message.content.trim();
+          
+          // Limpa formatação markdown de código caso a IA adicione
+          content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+
+          const fetchedCompanies = JSON.parse(content);
+
+          const formattedCompanies = fetchedCompanies.map((c, i) => ({
+            id: `lead-${Date.now()}-${i}`,
+            name: c.name,
+            site: c.site,
+            snippet: c.snippet,
+            category: segment,
+            city: city,
+            score: c.score || Math.floor(Math.random() * 20) + 75,
+            status: 'Novo'
+          }));
+
+          state.companies = [...formattedCompanies, ...state.companies];
+          localStorage.setItem('rp_companies', JSON.stringify(state.companies));
+
+        } catch (err) {
+          console.error('Erro na API:', err);
+          alert('Ocorreu um erro ao conectar com o motor de inteligência comercial.');
+        } finally {
+          btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
+          btn.disabled = false;
+          this.renderSearchTable();
+          this.renderDashboard();
+          this.renderKanban();
+        }
+      },
           if (fetchedCompanies.length > 0) {
             state.companies = [...fetchedCompanies, ...state.companies];
             localStorage.setItem('rp_companies', JSON.stringify(state.companies));
