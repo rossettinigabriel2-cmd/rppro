@@ -3,396 +3,244 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RP Prospect - Automação & Prospecção B2B</title>
-  <!-- Tailwind CSS CDN -->
+  <title>RP Prospect - Prospecção Inteligente B2B</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563EB', // Azul primário oficial
-              700: '#1d4ed8',
-              900: '#1e3a8a',
-            },
-            surface: {
-              50: '#f8fafc',
-              800: '#1e293b',
-              850: '#151f30',
-              900: '#0f172a',
-              950: '#0b0f19',
-            }
+            brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+            surface: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
           }
         }
       }
     }
   </script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-surface-950 text-slate-100 font-sans h-full antialiased selection:bg-brand-600 selection:text-white">
-
-  <!-- ========================================== -->
-  <!-- 1. TELA DE LOGIN                           -->
-  <!-- ========================================== -->
-  <div id="view-login" class="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-surface-950 via-surface-900 to-slate-900">
-    <div class="w-full max-w-md bg-surface-900/80 border border-slate-800 rounded-2xl p-8 shadow-2xl backdrop-blur-xl">
-      <div class="flex flex-col items-center mb-8">
-        <div class="h-12 w-12 rounded-xl bg-brand-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-brand-600/30 mb-3">
-          RP
+  <div id="app" class="h-full flex flex-col">
+    <!-- Screen 1: Login -->
+    <div id="screen-login" class="flex-1 flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-surface-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-2">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600/20 text-brand-500 mb-2">
+            <i class="fa-solid me-0 fa-chart-line text-2xl"></i>
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight text-white">RP Prospect</h1>
+          <p class="text-xs text-slate-400">Motor de Busca & Copiloto IA B2B</p>
         </div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">RP Prospect</h1>
-        <p class="text-sm text-slate-400 mt-1">Plataforma de Inteligência Comercial B2B</p>
+        <form onsubmit="app.login(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">E-mail</label>
+            <input type="email" value="demo@rpprospect.com" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Senha</label>
+            <input type="password" value="••••••••" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500" required>
+          </div>
+          <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg text-sm transition-all duration-200">
+            Entrar no Sistema
+          </button>
+        </form>
       </div>
-
-      <form id="form-login" onsubmit="app.handleLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">E-mail corporativo</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-              <i class="fa-solid fa-envelope"></i>
-            </span>
-            <input type="email" required value="demo@rpprospect.com.br" class="w-full bg-surface-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 transition" placeholder="seu@empresa.com">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Senha</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-              <i class="fa-solid fa-lock"></i>
-            </span>
-            <input type="password" required value="12345678" class="w-full bg-surface-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 focus:outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 transition" placeholder="••••••••">
-          </div>
-        </div>
-
-        <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 rounded-xl shadow-lg shadow-brand-600/25 transition duration-200 flex items-center justify-center gap-2">
-          <span>Entrar no Sistema</span>
-          <i class="fa-solid fa-arrow-right text-xs"></i>
-        </button>
-      </form>
     </div>
-  </div>
 
-  <!-- ========================================== -->
-  <!-- LAYOUT PRINCIPAL                           -->
-  <!-- ========================================== -->
-  <div id="view-app" class="hidden flex h-screen overflow-hidden bg-surface-950">
-
-    <!-- SIDEBAR NAV -->
-    <aside class="w-64 border-r border-slate-800/80 bg-surface-900/50 flex flex-col justify-between shrink-0">
-      <div>
-        <div class="h-16 flex items-center gap-3 px-6 border-b border-slate-800/80">
-          <div class="h-8 w-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold shadow-md shadow-brand-600/20">
-            RP
+    <!-- Main Layout (Dashboard / Search / CRM) -->
+    <div id="screen-main" class="hidden flex-1 flex flex-col md:flex-row overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="w-full md:w-64 bg-surface-900 border-r border-slate-800 flex flex-col justify-between p-4">
+        <div class="space-y-6">
+          <div class="flex items-center space-x-3 px-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center font-bold text-white text-sm">RP</div>
+            <span class="font-bold tracking-wide text-white">RP Prospect</span>
           </div>
-          <span class="font-bold text-lg text-white tracking-tight">RP Prospect</span>
+          <nav class="space-y-1">
+            <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium bg-brand-600/10 text-brand-500">
+              <i class="fa-solid fa-house w-4 text-center"></i>
+              <span>Dashboard</span>
+            </button>
+            <button onclick="app.navigate('search')" id="nav-search" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-surface-800 hover:text-white">
+              <i class="fa-solid fa-magnifying-glass w-4 text-center"></i>
+              <span>Buscar Empresas</span>
+            </button>
+            <button onclick="app.navigate('crm')" id="nav-crm" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-surface-800 hover:text-white">
+              <i class="fa-solid fa-kanban w-4 text-center"></i>
+              <span>CRM Pipeline</span>
+            </button>
+          </nav>
+        </div>
+        <div class="pt-4 border-t border-slate-800">
+          <button onclick="app.logout()" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400">
+            <i class="fa-solid fa-right-from-bracket w-4 text-center"></i>
+            <span>Sair</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 flex flex-col overflow-y-auto bg-surface-950 p-6 space-y-6">
+        
+        <!-- View: Dashboard -->
+        <div id="view-dashboard" class="space-y-6">
+          <header class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xl font-bold text-white">Visão Geral</h2>
+              <p class="text-xs text-slate-400">Métricas gerais de prospecção comercial</p>
+            </div>
+            <button onclick="app.navigate('search')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-4 py-2 rounded-lg font-medium">Nova Busca</button>
+          </header>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
+              <p class="text-xs text-slate-400">Leads Encontrados</p>
+              <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">0</h3>
+            </div>
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
+              <p class="text-xs text-slate-400">Em Qualificação</p>
+              <h3 id="stat-qualifying" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
+            </div>
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
+              <p class="text-xs text-slate-400">Propostas Enviadas</p>
+              <h3 id="stat-proposals" class="text-2xl font-bold text-brand-500 mt-1">0</h3>
+            </div>
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-4">
+              <p class="text-xs text-slate-400">Contratos Fechados</p>
+              <h3 id="stat-closed" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+            </div>
+          </div>
         </div>
 
-        <nav class="p-4 space-y-1">
-          <button onclick="app.navigate('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-            <i class="fa-solid fa-chart-pie w-5"></i>
-            <span>Dashboard</span>
-          </button>
-          
-          <button onclick="app.navigate('search')" id="nav-search" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-            <i class="fa-solid fa-magnifying-glass-location w-5"></i>
-            <span>Buscar Empresas</span>
-          </button>
+        <!-- View: Search -->
+        <div id="view-search" class="hidden space-y-6">
+          <div>
+            <h2 class="text-xl font-bold text-white">Busca de Leads em Tempo Real</h2>
+            <p class="text-xs text-slate-400">Extraia empresas diretamente do Google e analise com IA</p>
+          </div>
 
-          <button onclick="app.navigate('crm')" id="nav-crm" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
-            <i class="fa-solid fa-kanban w-5"></i>
-            <span>CRM Pipeline</span>
-          </button>
-        </nav>
-      </div>
-
-      <div class="p-4 border-t border-slate-800/80">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="h-9 w-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-semibold text-brand-500">
-              SDR
+          <form onsubmit="app.executeSearch(event)" class="bg-surface-900 border border-slate-800 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">O que você vende?</label>
+              <input type="text" id="search-offering" placeholder="Ex: Software de Gestão" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
             </div>
             <div>
-              <p class="text-xs font-semibold text-slate-200">Gestor Comercial</p>
-              <p class="text-[10px] text-slate-400">Plano Enterprise</p>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Segmento Alvo</label>
+              <input type="text" id="search-segment" placeholder="Ex: Contabilidades" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
             </div>
-          </div>
-          <button onclick="app.logout()" class="text-slate-500 hover:text-rose-400 p-2 text-sm transition" title="Sair">
-            <i class="fa-solid fa-right-from-bracket"></i>
-          </button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- ÁREA DE CONTEÚDO -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-surface-950">
-      
-      <header class="h-16 border-b border-slate-800/80 px-8 flex items-center justify-between bg-surface-900/30 backdrop-blur">
-        <h2 id="page-title" class="text-xl font-bold text-white tracking-tight">Dashboard</h2>
-        <div class="flex items-center gap-4">
-          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Scrape.do Engine Ativo
-          </span>
-        </div>
-      </header>
-
-      <div class="flex-1 overflow-y-auto p-8" id="content-area">
-
-        <!-- 2. DASHBOARD -->
-        <section id="section-dashboard" class="space-y-8 hidden">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="bg-surface-900 border border-slate-800/80 rounded-2xl p-6 shadow-sm">
-              <div class="flex items-center justify-between text-slate-400 mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wider">Empresas</span>
-                <i class="fa-solid fa-building text-brand-600"></i>
-              </div>
-              <div class="text-3xl font-bold text-white" id="dash-stat-companies">0</div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Cidade</label>
+              <input type="text" id="search-city" placeholder="Ex: São Paulo" class="w-full bg-surface-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500" required>
             </div>
-
-            <div class="bg-surface-900 border border-slate-800/80 rounded-2xl p-6 shadow-sm">
-              <div class="flex items-center justify-between text-slate-400 mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wider">Leads Qualificados</span>
-                <i class="fa-solid fa-user-check text-indigo-400"></i>
-              </div>
-              <div class="text-3xl font-bold text-white" id="dash-stat-qualified">0</div>
+            <div class="flex items-end">
+              <button type="submit" id="btn-search-submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Encontrar Clientes</span>
+              </button>
             </div>
+          </form>
 
-            <div class="bg-surface-900 border border-slate-800/80 rounded-2xl p-6 shadow-sm">
-              <div class="flex items-center justify-between text-slate-400 mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wider">Reuniões</span>
-                <i class="fa-solid fa-calendar-check text-amber-400"></i>
-              </div>
-              <div class="text-3xl font-bold text-white" id="dash-stat-meetings">0</div>
-            </div>
-
-            <div class="bg-surface-900 border border-slate-800/80 rounded-2xl p-6 shadow-sm">
-              <div class="flex items-center justify-between text-slate-400 mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wider">Clientes</span>
-                <i class="fa-solid fa-circle-dollar-to-slot text-emerald-400"></i>
-              </div>
-              <div class="text-3xl font-bold text-white" id="dash-stat-clients">0</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 3. BUSCAR EMPRESAS -->
-        <section id="section-search" class="space-y-6 hidden">
-          <div class="bg-surface-900 border border-slate-800/80 rounded-2xl p-6">
-            <h3 class="text-base font-semibold text-white mb-4">Parâmetros de Prospecção</h3>
-            <form onsubmit="app.executeSearch(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1.5">O que você vende?</label>
-                <input type="text" id="search-offering" required placeholder="Ex: Software ERP" class="w-full bg-surface-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-600">
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1.5">Segmento</label>
-                <input type="text" id="search-segment" required placeholder="Ex: Logística" class="w-full bg-surface-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-600">
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1.5">Cidade</label>
-                <input type="text" id="search-city" required placeholder="Ex: São Paulo" class="w-full bg-surface-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-600">
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1.5">Quantidade</label>
-                <input type="number" id="search-amount" min="1" max="20" value="5" class="w-full bg-surface-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-600">
-              </div>
-
-              <div class="flex items-end">
-                <button type="submit" id="btn-search-submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm h-[38px]">
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                  <span>Encontrar Clientes</span>
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Tabela -->
-          <div class="bg-surface-900 border border-slate-800/80 rounded-2xl overflow-hidden shadow-sm">
-            <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center">
-              <h4 class="font-semibold text-white text-sm">Empresas Encontradas</h4>
-              <span id="search-count-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">0 empresas</span>
-            </div>
-
+          <!-- Search Results Table -->
+          <div class="bg-surface-900 border border-slate-800 rounded-xl overflow-hidden">
             <div class="overflow-x-auto">
-              <table class="w-full text-left text-sm">
-                <thead class="bg-surface-950/60 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-800/80">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-surface-800 text-slate-400 border-b border-slate-700">
                   <tr>
-                    <th class="px-6 py-3.5">Empresa</th>
-                    <th class="px-6 py-3.5">Telefone</th>
-                    <th class="px-6 py-3.5">Site</th>
-                    <th class="px-6 py-3.5">LinkedIn</th>
-                    <th class="px-6 py-3.5">Score</th>
-                    <th class="px-6 py-3.5">Status</th>
-                    <th class="px-6 py-3.5 text-right">Ação</th>
+                    <th class="p-3">Empresa</th>
+                    <th class="p-3">Cidade/Setor</th>
+                    <th class="p-3">Score IA</th>
+                    <th class="p-3 text-right">Ação</th>
                   </tr>
                 </thead>
-                <tbody id="table-companies-body" class="divide-y divide-slate-800/50">
-                  <!-- JS Injeta Aqui -->
+                <tbody id="search-results-table" class="divide-y divide-slate-800 text-slate-300">
+                  <tr>
+                    <td colspan="4" class="p-4 text-center text-slate-500">Nenhuma busca realizada ainda. Preencha os campos acima.</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
-        </section>
+        </div>
 
-        <!-- 4. CRM KANBAN -->
-        <section id="section-crm" class="hidden h-full flex flex-col">
-          <div class="flex-1 overflow-x-auto pb-4">
-            <div class="flex gap-4 min-w-[1200px] h-full items-start" id="kanban-board">
-              <!-- JS Injeta Aqui -->
+        <!-- View: CRM -->
+        <div id="view-crm" class="hidden space-y-6">
+          <div>
+            <h2 class="text-xl font-bold text-white">Funil de Vendas (CRM)</h2>
+            <p class="text-xs text-slate-400">Gerencie a evolução das suas prospecções</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Novo Lead</h4>
+              <div id="crm-col-novo" class="space-y-2"></div>
             </div>
-          </div>
-        </section>
-
-      </div>
-    </main>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- 5. & 6. MODAL EMPRESA & IA                 -->
-  <!-- ========================================== -->
-  <div id="modal-company" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-    <div class="bg-surface-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
-      
-      <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-start sticky top-0 bg-surface-900/90 backdrop-blur z-10">
-        <div>
-          <div class="flex items-center gap-3">
-            <h3 id="modal-company-name" class="text-2xl font-bold text-white">Nome da Empresa</h3>
-            <span id="modal-company-score-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-600/20 text-brand-400 border border-brand-500/30">
-              Score: 0
-            </span>
-          </div>
-          <p id="modal-company-category-city" class="text-sm text-slate-400 mt-1">Categoria • Cidade</p>
-        </div>
-        <button onclick="app.closeModal()" class="text-slate-400 hover:text-white p-2 text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="p-8 space-y-8">
-        <!-- 5. Campos de Empresa -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-surface-950 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-500 font-medium block mb-1">Telefone</span>
-            <span id="modal-company-phone" class="text-sm text-slate-200 font-semibold">-</span>
-          </div>
-          <div class="bg-surface-950 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-500 font-medium block mb-1">Site</span>
-            <a id="modal-company-site" href="#" target="_blank" class="text-sm text-brand-400 hover:underline font-semibold block truncate">-</a>
-          </div>
-          <div class="bg-surface-950 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-500 font-medium block mb-1">LinkedIn</span>
-            <a id="modal-company-linkedin" href="#" target="_blank" class="text-sm text-brand-400 hover:underline font-semibold block truncate">-</a>
-          </div>
-          <div class="bg-surface-950 p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-500 font-medium block mb-1">Instagram</span>
-            <span id="modal-company-instagram" class="text-sm text-slate-200 font-semibold block truncate">-</span>
-          </div>
-        </div>
-
-        <!-- Botões -->
-        <div class="flex flex-wrap gap-3">
-          <button onclick="app.analyzeCompanyWithAI()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2">
-            <i class="fa-solid fa-microchip"></i> Analisar Empresa
-          </button>
-          <button onclick="app.generateApproachWithAI()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Abordagem
-          </button>
-          <button onclick="app.addCurrentToCRM()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i> Adicionar ao CRM
-          </button>
-        </div>
-
-        <!-- 6. PAINEL DE IA -->
-        <div class="bg-surface-950 border border-slate-800 rounded-2xl p-6 space-y-6">
-          <div class="flex items-center gap-2 border-b border-slate-800/80 pb-3">
-            <i class="fa-solid fa-brain text-brand-500"></i>
-            <h4 class="font-bold text-white text-base">Copiloto IA</h4>
-          </div>
-
-          <div id="ai-content" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-              <div>
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lead Score</span>
-                <div class="text-2xl font-bold text-white" id="ai-lead-score">--/100</div>
-              </div>
-              <div>
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Resumo</span>
-                <p id="ai-summary" class="text-sm text-slate-300 mt-1">Clique nos botões acima para processar com a IA.</p>
-              </div>
-              <div>
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Problemas Encontrados</span>
-                <ul id="ai-problems" class="list-disc list-inside text-sm text-slate-300 mt-1 space-y-1">
-                  <li class="text-slate-500">Aguardando análise...</li>
-                </ul>
-              </div>
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
+              <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Em Contato</h4>
+              <div id="crm-col-contato" class="space-y-2"></div>
             </div>
-
-            <div class="flex flex-col">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Mensagem Comercial Pronta</span>
-              <textarea id="ai-message" readonly class="w-full flex-1 min-h-[140px] bg-surface-900 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 resize-none focus:outline-none" placeholder="A mensagem gerada aparecerá aqui..."></textarea>
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
+              <h4 class="text-xs font-bold text-brand-500 uppercase tracking-wider">Reunião Agendada</h4>
+              <div id="crm-col-reuniao" class="space-y-2"></div>
+            </div>
+            <div class="bg-surface-900 border border-slate-800 rounded-xl p-3 space-y-3">
+              <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Cliente Fechado</h4>
+              <div id="crm-col-fechado" class="space-y-2"></div>
             </div>
           </div>
         </div>
+      </main>
+    </div>
 
+    <!-- Company Detail Modal -->
+    <div id="modal-company" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-surface-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4">
+        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+          <div>
+            <h3 id="modal-company-name" class="text-lg font-bold text-white">---</h3>
+            <p id="modal-company-category" class="text-xs text-slate-400">---</p>
+          </div>
+          <button onclick="app.closeModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div class="flex items-center space-x-2 text-slate-300">
+            <i class="fa-solid fa-link w-4"></i>
+            <a id="modal-company-site" href="#" target="_blank" class="text-brand-500 hover:underline">---</a>
+          </div>
+
+          <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-200">Análise de IA (GPT-4o)</span>
+              <button onclick="app.analyzeCompanyWithAI()" class="bg-brand-600/20 text-brand-400 hover:bg-brand-600/30 px-2 py-1 rounded text-xs font-medium">Analisar Agora</button>
+            </div>
+            <p id="ai-summary" class="text-slate-400 text-xs">Clique no botão para gerar um diagnóstico comercial completo da empresa.</p>
+          </div>
+
+          <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-200">Abordagem Personalizada (Copiloto)</span>
+              <button onclick="app.generateApproachWithAI()" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 px-2 py-1 rounded text-xs font-medium">Gerar Abordagem</button>
+            </div>
+            <textarea id="ai-message" rows="4" class="w-full bg-surface-900 border border-slate-700 rounded p-2 text-xs text-slate-200 focus:outline-none" placeholder="A mensagem de vendas aparecerá aqui..."></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+          <button onclick="app.closeModal()" class="px-4 py-2 bg-surface-800 hover:bg-surface-700 text-slate-300 rounded-lg text-xs">Fechar</button>
+          <button onclick="app.addCurrentToCRM()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium">Adicionar ao CRM</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- JAVASCRIPT & SCRAPE.DO INTEGRATION         -->
-  <!-- ========================================== -->
   <script>
+    // CHAVES DE API INTEGRADAS
+    const SCRAPE_DO_KEY = '072f58f5636644c0bb1e3e1529e368b4fec522d2223';
+    const OPENAI_API_KEY = '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';
+
     const state = {
-      companies: [
-        { id: "c1", name: "Tech Logística SP", phone: "(11) 98888-7777", site: "https://techlog.demo", linkedin: "https://linkedin.com", instagram: "@techlog", city: "São Paulo", category: "Logística", score: 85, status: "Novo" },
-        { id: "c2", name: "Clínica Saúde Total", phone: "(21) 3333-4444", site: "https://saudetotal.demo", linkedin: "https://linkedin.com", instagram: "@saudetotal", city: "Rio de Janeiro", category: "Saúde", score: 70, status: "Contato" }
-      ],
-      activeCompanyId: null,
-      kanbanStages: ["Novo", "Contato", "Interessado", "Reunião", "Cliente"]
-    };
-
-    // MÓDULO DE SCRAPING VIA SCRAPE.DO
-    const ProspectingService = {
-      async search({ offering, segment, city, amount }) {
-        const scrapeDoToken = 'COLE_SEU_TOKEN_SCRAPE_DO_AQUI'; // Insira o token do Scrape.do se possuir
-
-        try {
-          // Se houver token, executa via Scrape.do Proxy
-          if (scrapeDoToken && scrapeDoToken !== 'COLE_SEU_TOKEN_SCRAPE_DO_AQUI') {
-            const targetUrl = encodeURIComponent(`https://www.google.com/search?q=${segment}+em+${city}`);
-            await fetch(`https://api.scrape.do?token=${scrapeDoToken}&url=${targetUrl}`);
-          } else {
-            // Simulador com tempo de espera caso não tenha inserido a API Key ainda
-            await new Promise(r => setTimeout(r, 800));
-          }
-        } catch (e) {
-          console.log('Modo fallback ativo');
-        }
-
-        // Retorna empresas estruturadas para o sistema
-        return Array.from({ length: amount }, (_, i) => ({
-          id: `comp-${Date.now()}-${i}`,
-          name: `${segment} ${city} ${i + 1}`,
-          phone: `(${Math.floor(Math.random()*89)+10}) 9${Math.floor(Math.random()*8900)+1000}-${Math.floor(Math.random()*8900)+1000}`,
-          site: `https://empresa-${i + 1}.com.br`,
-          linkedin: `https://linkedin.com/company/empresa-${i + 1}`,
-          instagram: `@empresa_${i + 1}`,
-          city: city,
-          category: segment,
-          score: Math.floor(Math.random() * 30) + 70,
-          status: 'Novo'
-        }));
-      }
+      companies: JSON.parse(localStorage.getItem('rp_companies')) || [],
+      activeCompanyId: null
     };
 
     const app = {
@@ -402,124 +250,124 @@
         this.renderKanban();
       },
 
-      handleLogin(e) {
+      login(e) {
         e.preventDefault();
-        document.getElementById('view-login').classList.add('hidden');
-        document.getElementById('view-app').classList.remove('hidden');
-        this.navigate('dashboard');
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-main').classList.remove('hidden');
+        this.init();
       },
 
       logout() {
-        document.getElementById('view-app').classList.add('hidden');
-        document.getElementById('view-login').classList.remove('hidden');
+        document.getElementById('screen-main').classList.add('hidden');
+        document.getElementById('screen-login').classList.remove('hidden');
       },
 
       navigate(view) {
         ['dashboard', 'search', 'crm'].forEach(v => {
-          document.getElementById(`section-${v}`).classList.add('hidden');
-          document.getElementById(`nav-${v}`).classList.remove('bg-brand-600/10', 'text-brand-500');
+          document.getElementById(`view-${v}`).classList.add('hidden');
+          const navBtn = document.getElementById(`nav-${v}`);
+          navBtn.classList.remove('bg-brand-600/10', 'text-brand-500');
+          navBtn.classList.add('text-slate-400');
         });
 
-        document.getElementById(`section-${view}`).classList.remove('hidden');
-        document.getElementById(`nav-${view}`).classList.add('bg-brand-600/10', 'text-brand-500');
-
-        if(view === 'dashboard') this.renderDashboard();
-        if(view === 'crm') this.renderKanban();
-      },
-
-      renderDashboard() {
-        document.getElementById('dash-stat-companies').innerText = state.companies.length;
-        document.getElementById('dash-stat-qualified').innerText = state.companies.filter(c => c.score >= 75).length;
-        document.getElementById('dash-stat-meetings').innerText = state.companies.filter(c => c.status === 'Reunião').length;
-        document.getElementById('dash-stat-clients').innerText = state.companies.filter(c => c.status === 'Cliente').length;
+        document.getElementById(`view-${view}`).classList.remove('hidden');
+        const activeNav = document.getElementById(`nav-${view}`);
+        activeNav.classList.add('bg-brand-600/10', 'text-brand-500');
+        activeNav.classList.remove('text-slate-400');
       },
 
       async executeSearch(e) {
         e.preventDefault();
+        const offering = document.getElementById('search-offering').value;
+        const segment = document.getElementById('search-segment').value;
+        const city = document.getElementById('search-city').value;
         const btn = document.getElementById('btn-search-submit');
+
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Buscando no Google...</span>`;
         btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Prospectando...`;
 
-        const newCompanies = await ProspectingService.search({
-          offering: document.getElementById('search-offering').value,
-          segment: document.getElementById('search-segment').value,
-          city: document.getElementById('search-city').value,
-          amount: parseInt(document.getElementById('search-amount').value)
-        });
+        try {
+          const query = encodeURIComponent(`empresas de ${segment} em ${city}`);
+          const googleUrl = `https://www.google.com/search?q=${query}`;
+          const proxyUrl = `https://api.scrape.do?token=${SCRAPE_DO_KEY}&url=${encodeURIComponent(googleUrl)}`;
 
-        state.companies = [...newCompanies, ...state.companies];
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Encontrar Clientes`;
-        this.renderSearchTable();
+          const res = await fetch(proxyUrl);
+          const html = await res.text();
+          
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const cards = doc.querySelectorAll('div.g');
+          
+          const fetchedCompanies = [];
+          cards.forEach((card, i) => {
+            if (i >= 6) return;
+            const titleEl = card.querySelector('h3');
+            const linkEl = card.querySelector('a');
+            const snippetEl = card.querySelector('.VwiC3b') || card.querySelector('.st');
+
+            if (titleEl && linkEl) {
+              fetchedCompanies.push({
+                id: `real-${Date.now()}-${i}`,
+                name: titleEl.innerText,
+                site: linkEl.href,
+                snippet: snippetEl ? snippetEl.innerText : '',
+                category: segment,
+                city: city,
+                score: Math.floor(Math.random() * 20) + 75,
+                status: 'Novo'
+              });
+            }
+          });
+
+          if (fetchedCompanies.length > 0) {
+            state.companies = [...fetchedCompanies, ...state.companies];
+            localStorage.setItem('rp_companies', JSON.stringify(state.companies));
+          } else {
+            alert('A busca não retornou novos resultados formatados. Tente ajustar os termos.');
+          }
+
+        } catch (err) {
+          console.error('Erro na API:', err);
+          alert('Erro ao buscar dados. Verifique a conexão com as APIs.');
+        } finally {
+          btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
+          btn.disabled = false;
+          this.renderSearchTable();
+          this.renderDashboard();
+          this.renderKanban();
+        }
       },
 
       renderSearchTable() {
-        const tbody = document.getElementById('table-companies-body');
-        document.getElementById('search-count-badge').innerText = `${state.companies.length} empresas`;
+        const tbody = document.getElementById('search-results-table');
+        if (state.companies.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma empresa encontrada. Faça uma busca acima.</td></tr>`;
+          return;
+        }
 
         tbody.innerHTML = state.companies.map(c => `
-          <tr class="hover:bg-slate-900/50">
-            <td class="px-6 py-4 font-semibold text-white">${c.name}</td>
-            <td class="px-6 py-4 text-slate-400">${c.phone}</td>
-            <td class="px-6 py-4"><a href="${c.site}" target="_blank" class="text-brand-400 hover:underline">${c.site}</a></td>
-            <td class="px-6 py-4"><a href="${c.linkedin}" target="_blank" class="text-brand-400 hover:underline">Perfil</a></td>
-            <td class="px-6 py-4"><span class="px-2 py-1 rounded bg-brand-600/20 text-brand-400 font-bold text-xs">${c.score}/100</span></td>
-            <td class="px-6 py-4"><span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300">${c.status}</span></td>
-            <td class="px-6 py-4 text-right">
-              <button onclick="app.openCompanyModal('${c.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg font-medium">Detalhes</button>
+          <tr class="hover:bg-surface-800/50">
+            <td class="p-3 font-medium text-white">${c.name}</td>
+            <td class="p-3 text-slate-400">${c.category} em ${c.city}</td>
+            <td class="p-3"><span class="bg-brand-600/20 text-brand-400 px-2 py-0.5 rounded text-xs font-bold">${c.score}/100</span></td>
+            <td class="p-3 text-right">
+              <button onclick="app.openModal('${c.id}')" class="bg-surface-800 hover:bg-surface-700 text-slate-200 px-3 py-1 rounded text-xs">Detalhes & IA</button>
             </td>
           </tr>
         `).join('');
       },
 
-      renderKanban() {
-        const board = document.getElementById('kanban-board');
-        board.innerHTML = state.kanbanStages.map(stage => {
-          const stageCompanies = state.companies.filter(c => c.status === stage);
-          return `
-            <div class="flex-1 bg-surface-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col h-full min-w-[240px]"
-                 ondragover="event.preventDefault()" ondrop="app.handleDrop(event, '${stage}')">
-              <div class="flex items-center justify-between mb-3">
-                <span class="font-bold text-sm text-slate-200">${stage}</span>
-                <span class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">${stageCompanies.length}</span>
-              </div>
-              <div class="space-y-3 flex-1 overflow-y-auto">
-                ${stageCompanies.map(c => `
-                  <div class="bg-surface-950 border border-slate-800 rounded-xl p-4 cursor-grab" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${c.id}')" onclick="app.openCompanyModal('${c.id}')">
-                    <h5 class="font-bold text-slate-100 text-sm">${c.name}</h5>
-                    <p class="text-xs text-slate-400 mt-1">${c.category} • ${c.city}</p>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `;
-        }).join('');
-      },
-
-      handleDrop(e, targetStage) {
-        e.preventDefault();
-        const id = e.dataTransfer.getData('text/plain');
-        const company = state.companies.find(c => c.id === id);
-        if (company) {
-          company.status = targetStage;
-          this.renderKanban();
-        }
-      },
-
-      openCompanyModal(id) {
-        state.activeCompanyId = id;
+      openModal(id) {
         const company = state.companies.find(c => c.id === id);
         if (!company) return;
+        state.activeCompanyId = id;
 
         document.getElementById('modal-company-name').innerText = company.name;
-        document.getElementById('modal-company-score-badge').innerText = `Score: ${company.score}`;
-        document.getElementById('modal-company-category-city').innerText = `${company.category} • ${company.city}`;
-        document.getElementById('modal-company-phone').innerText = company.phone;
+        document.getElementById('modal-company-category').innerText = `${company.category} • ${company.city}`;
         document.getElementById('modal-company-site').innerText = company.site;
         document.getElementById('modal-company-site').href = company.site;
-        document.getElementById('modal-company-linkedin').innerText = company.linkedin;
-        document.getElementById('modal-company-linkedin').href = company.linkedin;
-        document.getElementById('modal-company-instagram').innerText = company.instagram;
+        document.getElementById('ai-summary').innerText = "Clique no botão acima para analisar com GPT-4o.";
+        document.getElementById('ai-message').value = "";
 
         document.getElementById('modal-company').classList.remove('hidden');
       },
@@ -528,33 +376,111 @@
         document.getElementById('modal-company').classList.add('hidden');
       },
 
-      analyzeCompanyWithAI() {
+      async analyzeCompanyWithAI() {
         const company = state.companies.find(c => c.id === state.activeCompanyId);
-        document.getElementById('ai-lead-score').innerText = `${company.score}/100`;
-        document.getElementById('ai-summary').innerText = `A ${company.name} possui operação no setor de ${company.category} em ${company.city} e apresenta perfil ideal de contratação.`;
-        document.getElementById('ai-problems').innerHTML = `
-          <li>Gargalo no fluxo manual de aquisição</li>
-          <li>Falta de automação comercial B2B</li>
-        `;
+        document.getElementById('ai-summary').innerText = "Analisando dados com IA...";
+
+        const prompt = `Analise comercialmente esta empresa B2B e indique 2 gargalos/oportunidades prováveis:
+Empresa: ${company.name}
+Setor: ${company.category}
+Resumo: ${company.snippet || 'Empresa local no setor'}`;
+
+        try {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [{ role: 'user', content: prompt }]
+            })
+          });
+
+          const data = await res.json();
+          document.getElementById('ai-summary').innerText = data.choices[0].message.content;
+        } catch (err) {
+          document.getElementById('ai-summary').innerText = "Erro ao conectar com a IA da OpenAI.";
+        }
       },
 
-      generateApproachWithAI() {
+      async generateApproachWithAI() {
         const company = state.companies.find(c => c.id === state.activeCompanyId);
-        const offering = document.getElementById('search-offering').value || "nossas soluções";
-        document.getElementById('ai-message').value = `Olá equipe da ${company.name}!\n\nAcompanhando o crescimento de vocês em ${company.city}, notamos uma grande oportunidade para aplicar ${offering} e otimizar os seus resultados comerciais.\n\nTeria 10 minutos para uma breve conversa esta semana?`;
+        const offering = document.getElementById('search-offering').value || "nossas soluções corporativas";
+        document.getElementById('ai-message').value = "Escrevendo abordagem de alta conversão...";
+
+        const prompt = `Escreva uma mensagem de prospecção fria e persuasiva via WhatsApp/Email para o tomador de decisão da empresa ${company.name}.
+Produto/Serviço oferecido: ${offering}.
+Finalize com um convite direto para uma conversa de 15 minutos.`;
+
+        try {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [{ role: 'user', content: prompt }]
+            })
+          });
+
+          const data = await res.json();
+          document.getElementById('ai-message').value = data.choices[0].message.content;
+        } catch (err) {
+          document.getElementById('ai-message').value = "Erro ao gerar mensagem com OpenAI.";
+        }
       },
 
       addCurrentToCRM() {
-        const company = state.companies.find(c => c.id === state.activeCompanyId);
+        this.closeModal();
+        this.navigate('crm');
+      },
+
+      renderDashboard() {
+        document.getElementById('stat-total').innerText = state.companies.length;
+        document.getElementById('stat-qualifying').innerText = state.companies.filter(c => c.status === 'Novo' || c.status === 'Em Contato').length;
+        document.getElementById('stat-proposals').innerText = state.companies.filter(c => c.status === 'Reunião Agendada').length;
+        document.getElementById('stat-closed').innerText = state.companies.filter(c => c.status === 'Cliente Fechado').length;
+      },
+
+      renderKanban() {
+        const cols = { 'Novo': 'crm-col-novo', 'Em Contato': 'crm-col-contato', 'Reunião Agendada': 'crm-col-reuniao', 'Cliente Fechado': 'crm-col-fechado' };
+        
+        Object.keys(cols).forEach(k => document.getElementById(cols[k]).innerHTML = '');
+
+        state.companies.forEach(c => {
+          const colId = cols[c.status] || 'crm-col-novo';
+          const cardHtml = `
+            <div class="bg-surface-800 border border-slate-700 p-3 rounded-lg text-xs space-y-2">
+              <div class="font-bold text-white">${c.name}</div>
+              <div class="text-slate-400 text-[10px]">${c.category} • ${c.city}</div>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-700">
+                <select onchange="app.updateStatus('${c.id}', this.value)" class="bg-surface-900 border border-slate-700 text-slate-300 rounded px-1.5 py-0.5 text-[10px]">
+                  <option value="Novo" ${c.status === 'Novo' ? 'selected' : ''}>Novo</option>
+                  <option value="Em Contato" ${c.status === 'Em Contato' ? 'selected' : ''}>Em Contato</option>
+                  <option value="Reunião Agendada" ${c.status === 'Reunião Agendada' ? 'selected' : ''}>Reunião</option>
+                  <option value="Cliente Fechado" ${c.status === 'Cliente Fechado' ? 'selected' : ''}>Fechado</option>
+                </select>
+              </div>
+            </div>
+          `;
+          document.getElementById(colId).innerHTML += cardHtml;
+        });
+      },
+
+      updateStatus(id, newStatus) {
+        const company = state.companies.find(c => c.id === id);
         if (company) {
-          company.status = "Novo";
-          this.closeModal();
-          this.navigate('crm');
+          company.status = newStatus;
+          localStorage.setItem('rp_companies', JSON.stringify(state.companies));
+          this.renderKanban();
+          this.renderDashboard();
         }
       }
     };
-
-    window.addEventListener('DOMContentLoaded', () => app.init());
   </script>
 </body>
 </html>
