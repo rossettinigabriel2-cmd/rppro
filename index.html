@@ -277,8 +277,7 @@
           activeNav.classList.remove('text-slate-400');
         }
       },
-
-      async executeSearch(e) {
+async executeSearch(e) {
         if (e) e.preventDefault();
         const offering = document.getElementById('search-offering').value;
         const segment = document.getElementById('search-segment').value;
@@ -289,7 +288,7 @@
         btn.disabled = true;
 
         try {
-          const res = await fetch(SUPABASE_FUNCTION_URL, {
+          const res = await fetch(window.SUPABASE_FUNCTION_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -299,7 +298,12 @@
           });
 
           const data = await res.json();
-          if (data.error) throw new Error(data.error);
+          
+          // Se o Supabase devolver um status de erro ou a propriedade error
+          if (!res.ok || data.error) {
+            const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : (data.error || 'Erro desconhecido na Function');
+            throw new Error(errorMsg);
+          }
 
           const parsedContent = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
           const fetchedCompanies = parsedContent.companies || [];
@@ -315,9 +319,20 @@
             status: 'Novo'
           }));
 
-          state.companies = [...formattedCompanies, ...state.companies];
-          localStorage.setItem('rp_companies', JSON.stringify(state.companies));
+          window.state.companies = [...formattedCompanies, ...window.state.companies];
+          localStorage.setItem('rp_companies', JSON.stringify(window.state.companies));
 
+        } catch (err) {
+          console.error('Erro detalhado:', err);
+          alert('Erro no Supabase/Groq:\n\n' + err.message);
+        } finally {
+          btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
+          btn.disabled = false;
+          this.renderSearchTable();
+          this.renderDashboard();
+          this.renderKanban();
+        }
+      },
         } catch (err) {
   console.error('Erro detalhado na requisição:', err);
   alert('Erro retornado pelo servidor:\n' + JSON.stringify(err.message || err, null, 2));
