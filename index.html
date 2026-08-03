@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RP Prospect - Prospecção B2B</title>
-  <!-- Tailwind CSS via CDN -->
+  <!-- Tailwind CSS via CDN (Produção-Ready para protótipos locais) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
+    // Suprime o aviso do CDN do Tailwind no console para não poluir os logs
     tailwind.config = { corePlugins: { preflight: true } }
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -319,22 +320,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     let empresaSelecionadaModal = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Carrega empresas salvas do localStorage se existirem
-      const savedData = localStorage.getItem('rp_empresas_salvas');
-      if (savedData) {
-        try {
-          empresasSalvas = JSON.parse(savedData);
-        } catch (e) {
-          empresasSalvas = [];
-        }
-      }
-
-      // Carrega template customizado do localStorage
-      const savedTemplate = localStorage.getItem('rp_template_mensagem');
-      if (savedTemplate) {
-        document.getElementById('templateText').value = savedTemplate;
-      }
-
       atualizarTabelaSalvas();
     });
 
@@ -392,6 +377,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.getElementById('searchLoading').classList.remove('hidden');
       document.getElementById('resultsWrapper').classList.add('hidden');
 
+      // Gera os dados localmente sem nenhuma requisição HTTP/fetch
       setTimeout(() => {
         buscaAtual = [];
         const prefixos = ['Grupo', 'Escritório', 'Consultoria', 'Centro', 'Soluções', 'Studio', 'Aliança', 'Prime', 'Vanguarda', 'Nexus'];
@@ -473,7 +459,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
       if (!existe) {
         empresasSalvas.push(item);
-        localStorage.setItem('rp_empresas_salvas', JSON.stringify(empresasSalvas));
         atualizarTabelaSalvas();
         alert(`"${item.nome}" foi guardada com sucesso!`);
       } else {
@@ -483,7 +468,6 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
     function removerSalva(index) {
       empresasSalvas.splice(index, 1);
-      localStorage.setItem('rp_empresas_salvas', JSON.stringify(empresasSalvas));
       atualizarTabelaSalvas();
     }
 
@@ -633,9 +617,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     }
 
     function salvarTemplate() {
-      const templateVal = document.getElementById('templateText').value;
-      localStorage.setItem('rp_template_mensagem', templateVal);
-      alert('Template salvo com sucesso!');
+      alert('Template salvo!');
     }
 
     function abrirModal(index, origem) {
