@@ -208,7 +208,7 @@
 
           <div class="bg-surface-800 p-3 rounded-lg border border-slate-700 space-y-2">
             <div class="flex justify-between items-center">
-              <span class="font-bold text-slate-200">Análise de IA (GPT-4o)</span>
+              <span class="font-bold text-slate-200">Análise de IA (Groq)</span>
               <button onclick="app.analyzeCompanyWithAI()" class="bg-brand-600/20 text-brand-400 hover:bg-brand-600/30 px-2 py-1 rounded text-xs font-medium">Analisar Agora</button>
             </div>
             <p id="ai-summary" class="text-slate-400 text-xs">Clique no botão para gerar um diagnóstico comercial completo da empresa.</p>
@@ -232,7 +232,10 @@
   </div>
 
   <script>
-    const OPENAI_API_KEY = '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';
+    
+    const SUPABASE_FUNCTION_URL = 'sb_publishable_DCjTIYmEzvxvF5yqMKRX8A_xdoAo9yt';
+   
+    const SUPABASE_FUNCTION_URL = 'https://SEU-PROJETO.supabase.co/functions/v1/prospect-ai';
 
     const state = {
       companies: JSON.parse(localStorage.getItem('rp_companies')) || [],
@@ -282,35 +285,21 @@
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Mapeando Mercado com IA...</span>`;
         btn.disabled = true;
 
-        const prompt = `Atue como um motor de busca comercial B2B. Liste 5 empresas reais existentes na cidade de ${city} do segmento de ${segment}. 
-        Retorne EXATAMENTE um array em formato JSON puro (sem marcação markdown, sem textos antes ou depois) no seguinte formato:
-        [
-          {
-            "name": "Nome Real da Empresa",
-            "site": "https://site-da-empresa.com.br",
-            "snippet": "Descrição sucinta do foco de atuação da empresa.",
-            "score": 88
-          }
-        ]`;
-
         try {
-          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          const res = await fetch(SUPABASE_FUNCTION_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${OPENAI_API_KEY}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
-              messages: [{ role: 'user', content: prompt }]
+              action: 'search',
+              payload: { city, segment, offering }
             })
           });
 
           const data = await res.json();
-          let content = data.choices[0].message.content.trim();
-          content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+          if (data.error) throw new Error(data.error);
 
-          const fetchedCompanies = JSON.parse(content);
+          const parsedContent = JSON.parse(data.result);
+          const fetchedCompanies = parsedContent.companies || [];
 
           const formattedCompanies = fetchedCompanies.map((c, i) => ({
             id: `lead-${Date.now()}-${i}`,
@@ -327,8 +316,8 @@
           localStorage.setItem('rp_companies', JSON.stringify(state.companies));
 
         } catch (err) {
-          console.error('Erro na API:', err);
-          alert('Ocorreu um erro ao conectar com a IA.');
+          console.error('Erro na requisição Supabase:', err);
+          alert('Ocorreu um erro ao conectar com o servidor do Supabase.');
         } finally {
           btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Encontrar Clientes</span>`;
           btn.disabled = false;
@@ -366,7 +355,7 @@
         document.getElementById('modal-company-category').innerText = `${company.category} • ${company.city}`;
         document.getElementById('modal-company-site').innerText = company.site;
         document.getElementById('modal-company-site').href = company.site;
-        document.getElementById('ai-summary').innerText = "Clique no botão acima para analisar com GPT-4o.";
+        document.getElementById('ai-summary').innerText = "Clique no botão acima para analisar com a IA.";
         document.getElementById('ai-message').value = "";
 
         document.getElementById('modal-company').classList.remove('hidden');
@@ -380,28 +369,27 @@
         const company = state.companies.find(c => c.id === state.activeCompanyId);
         document.getElementById('ai-summary').innerText = "Analisando dados com IA...";
 
-        const prompt = `Analise comercialmente esta empresa B2B e indique 2 gargalos/oportunidades prováveis:
-Empresa: ${company.name}
-Setor: ${company.category}
-Resumo: ${company.snippet || 'Empresa local no setor'}`;
-
         try {
-          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          const res = await fetch(SUPABASE_FUNCTION_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${OPENAI_API_KEY}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
-              messages: [{ role: 'user', content: prompt }]
+              action: 'analyze',
+              payload: {
+                name: company.name,
+                category: company.category,
+                snippet: company.snippet
+              }
             })
           });
 
           const data = await res.json();
-          document.getElementById('ai-summary').innerText = data.choices[0].message.content;
+          if (data.error) throw new Error(data.error);
+
+          document.getElementById('ai-summary').innerText = data.result;
         } catch (err) {
-          document.getElementById('ai-summary').innerText = "Erro ao conectar com a IA da OpenAI.";
+          console.error(err);
+          document.getElementById('ai-summary').innerText = "Erro ao processar análise via Supabase.";
         }
       },
 
@@ -410,27 +398,26 @@ Resumo: ${company.snippet || 'Empresa local no setor'}`;
         const offering = document.getElementById('search-offering').value || "nossas soluções corporativas";
         document.getElementById('ai-message').value = "Escrevendo abordagem de alta conversão...";
 
-        const prompt = `Escreva uma mensagem de prospecção fria e persuasiva via WhatsApp/Email para o tomador de decisão da empresa ${company.name}.
-Produto/Serviço oferecido: ${offering}.
-Finalize com um convite direto para uma conversa de 15 minutos.`;
-
         try {
-          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          const res = await fetch(SUPABASE_FUNCTION_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${OPENAI_API_KEY}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
-              messages: [{ role: 'user', content: prompt }]
+              action: 'approach',
+              payload: {
+                name: company.name,
+                offering: offering
+              }
             })
           });
 
           const data = await res.json();
-          document.getElementById('ai-message').value = data.choices[0].message.content;
+          if (data.error) throw new Error(data.error);
+
+          document.getElementById('ai-message').value = data.result;
         } catch (err) {
-          document.getElementById('ai-message').value = "Erro ao gerar mensagem com OpenAI.";
+          console.error(err);
+          document.getElementById('ai-message').value = "Erro ao gerar abordagem via Supabase.";
         }
       },
 
