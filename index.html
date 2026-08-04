@@ -138,7 +138,6 @@
           </div>
         </div>
 
-        <!-- RECURSO 5: HISTÓRICO DE BUSCAS RECENTES -->
         <div id="searchHistoryWrapper" class="hidden bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
           <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Buscas Recentes:</span>
           <div id="searchHistoryChips" class="flex flex-wrap gap-2"></div>
@@ -184,7 +183,6 @@
           </button>
         </div>
 
-        <!-- RECURSO 3: METRICAS E DASHBOARD -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
             <span class="text-xs text-slate-400 font-medium uppercase">Total de Leads</span>
@@ -204,7 +202,6 @@
           </div>
         </div>
 
-        <!-- FILTROS DO CRM -->
         <div class="flex flex-wrap items-center gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
           <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-2">Filtrar por Status:</span>
           <button onclick="filtrarStatus('todos')" id="filterBtn-todos" class="px-3 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition-all">Todos</button>
@@ -280,7 +277,7 @@
     </main>
   </div>
 
-  <!-- MODAL DE DETALHES COM DISPARO SEQUENCIAL -->
+  <!-- MODAL DE DETALHES -->
   <div id="modalDetails" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
       
@@ -290,7 +287,6 @@
           <span id="modalSector" class="text-xs text-indigo-400">---</span>
         </div>
         
-        <!-- RECURSO 4: DISPARO SEQUENCIAL (NAVEGAÇÃO) -->
         <div class="flex items-center space-x-2">
           <button onclick="navegarModal(-1)" title="Lead Anterior" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs border border-slate-700">
             <i class="fa-solid fa-chevron-left"></i> Anterior
@@ -327,7 +323,7 @@
               <i class="fa-solid fa-pen-to-square"></i>
               <span>Anotações & Histórico de Conversa</span>
             </h4>
-            <span class="text-[10px] text-slate-500">Salvo no Firestore</span>
+            <span class="text-[10px] text-slate-500">Salvo no Banco</span>
           </div>
           <textarea id="modalNotes" rows="3" onchange="salvarAnotacaoLead(this.value)" placeholder="Escreva observações aqui..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50"></textarea>
         </div>
@@ -431,7 +427,6 @@
       document.getElementById('searchLoading').classList.remove('hidden');
       document.getElementById('resultsWrapper').classList.add('hidden');
 
-      // Adicionar ao Histórico
       adicionarHistoricoBusca(city, segment);
 
       try {
@@ -549,7 +544,7 @@
       }
     }
 
-    // 3. CARTEIRA DE EMPRESAS (CRM & FIRESTORE)
+    // 3. CARTEIRA DE EMPRESAS (GUARDAR DADOS NO REALTIME DATABASE / FIRESTORE)
     async function guardarEmpresa(index) {
       const item = buscaAtual[index];
       const existe = empresasSalvas.some(e => e.nome === item.nome);
@@ -558,48 +553,53 @@
         const leadPayload = {
           userId: window.currentUser.uid,
           nome: item.nome,
+          email: item.email || '',
           setor: item.setor || 'Geral',
           descricao: item.descricao || '',
           site: item.site || '#',
           telefones: item.telefones || [],
           whatsapp: item.whatsapp || '',
-          email: item.email || '',
           status: 'novo',
           anotacoes: '',
           criadoEm: new Date().toISOString()
         };
 
         try {
-          // Salva no Firestore
-          const docRef = await window.addDoc(window.collection(window.db, "leads"), leadPayload);
-          leadPayload.id = docRef.id;
+          // Salva no Realtime Database via push/set
+          const novoClienteRef = window.push(window.ref(window.rtdb, 'clientes'));
+          await window.set(novoClienteRef, leadPayload);
+          
+          leadPayload.id = novoClienteRef.key;
           empresasSalvas.push(leadPayload);
           atualizarTabelaSalvas();
-          alert(`"${item.nome}" foi salva no seu Funil do Firestore!`);
+          alert(`"${item.nome}" foi salvo no Firebase Realtime Database com sucesso!`);
         } catch (err) {
-          console.error("Erro ao salvar no Firestore:", err);
-          alert("Erro ao salvar lead no banco de dados.");
+          console.error("Erro ao guardar no Realtime Database:", err);
+          alert("Erro ao salvar dados no Firebase: " + err.message);
         }
       } else {
         alert('Esta empresa já está no seu Funil.');
       }
     }
 
-    async function carregarLeadsDoFirestore() {
+    async function carregarLeadsDoFirebase() {
       if (!window.currentUser) return;
       try {
-        const q = window.query(
-          window.collection(window.db, "leads"),
-          window.where("userId", "==", window.currentUser.uid)
-        );
-        const querySnapshot = await window.getDocs(q);
+        const clientesRef = window.ref(window.rtdb, 'clientes');
+        const snapshot = await window.get(clientesRef);
+        
         empresasSalvas = [];
-        querySnapshot.forEach((doc) => {
-          empresasSalvas.push({ id: doc.id, ...doc.data() });
-        });
+        if (snapshot.exists()) {
+          const dados = snapshot.val();
+          Object.keys(dados).forEach(key => {
+            if (dados[key].userId === window.currentUser.uid) {
+              empresasSalvas.push({ id: key, ...dados[key] });
+            }
+          });
+        }
         atualizarTabelaSalvas();
       } catch (err) {
-        console.error("Erro ao carregar leads:", err);
+        console.error("Erro ao carregar do Realtime Database:", err);
       }
     }
 
@@ -607,7 +607,7 @@
       const lead = empresasSalvas[indexOriginal];
       if (lead && lead.id) {
         try {
-          await window.deleteDoc(window.doc(window.db, "leads", lead.id));
+          await window.remove(window.ref(window.rtdb, `clientes/${lead.id}`));
         } catch (err) {
           console.error("Erro ao deletar lead:", err);
         }
@@ -622,7 +622,7 @@
       
       if (lead && lead.id) {
         try {
-          await window.updateDoc(window.doc(window.db, "leads", lead.id), { status: novoStatus });
+          await window.update(window.ref(window.rtdb, `clientes/${lead.id}`), { status: novoStatus });
         } catch (err) {
           console.error("Erro ao atualizar status:", err);
         }
@@ -646,7 +646,6 @@
       const emptyState = document.getElementById('savedEmptyState');
       document.getElementById('badgeSaved').innerText = empresasSalvas.length;
 
-      // Atualizar Métricas
       atualizarMetricasCRM();
 
       tbody.innerHTML = '';
@@ -776,7 +775,6 @@
 
       document.getElementById('modalMsgText').value = mensagemFormatada;
 
-      // Link do WhatsApp
       const waBtn = document.getElementById('modalWhatsappBtn');
       const numClean = (empresaSelecionadaModal.whatsapp || telPrincipal).replace(/\D/g, '');
       const textEncoded = encodeURIComponent(mensagemFormatada);
@@ -785,7 +783,6 @@
         ? `https://wa.me/${numClean}?text=${textEncoded}`
         : `https://api.whatsapp.com/send?text=${textEncoded}`;
 
-      // Link do E-mail
       const emailBtn = document.getElementById('modalEmailBtn');
       const emailDestino = empresaSelecionadaModal.email || ''; 
       const assunto = encodeURIComponent(`Oportunidade de Parceria com a ${empresaSelecionadaModal.nome}`);
@@ -816,9 +813,9 @@
         empresaSelecionadaModal.anotacoes = texto;
         if (empresaSelecionadaModal.id) {
           try {
-            await window.updateDoc(window.doc(window.db, "leads", empresaSelecionadaModal.id), { anotacoes: texto });
+            await window.update(window.ref(window.rtdb, `clientes/${empresaSelecionadaModal.id}`), { anotacoes: texto });
           } catch(e) {
-            console.error("Erro ao atualizar anotações no Firestore:", e);
+            console.error("Erro ao atualizar anotações no Firebase:", e);
           }
         }
       }
@@ -895,20 +892,19 @@
       onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
-      getFirestore, 
-      collection, 
-      addDoc, 
-      getDocs, 
-      doc, 
-      updateDoc, 
-      deleteDoc, 
-      query, 
-      where 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      getDatabase, 
+      ref, 
+      push, 
+      set, 
+      get, 
+      update, 
+      remove 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBYlR6csHhWNoJKpFTD0d8ZArEiTwH3G8s",
       authDomain: "rppro-23053.firebaseapp.com",
+      databaseURL: "https://rppro-23053-default-rtdb.firebaseio.com",
       projectId: "rppro-23053",
       storageBucket: "rppro-23053.firebasestorage.app",
       messagingSenderId: "904343446960",
@@ -918,22 +914,20 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
 
-    // Disponibilizando no escopo global para o JavaScript tradicional usar
+    // Disponibilizando no escopo global
     window.auth = auth;
-    window.db = db;
+    window.rtdb = rtdb;
+    window.ref = ref;
+    window.push = push;
+    window.set = set;
+    window.get = get;
+    window.update = update;
+    window.remove = remove;
     window.signInWithEmailAndPassword = signInWithEmailAndPassword;
     window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
     window.signOut = signOut;
-    window.collection = collection;
-    window.addDoc = addDoc;
-    window.getDocs = getDocs;
-    window.doc = doc;
-    window.updateDoc = updateDoc;
-    window.deleteDoc = deleteDoc;
-    window.query = query;
-    window.where = where;
 
     // Listener de Sessão (Realtime State)
     onAuthStateChanged(auth, (user) => {
@@ -943,8 +937,8 @@
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('appContainer').classList.remove('hidden');
         
-        // Carrega automaticamente os leads que este usuário salvou no Firestore
-        carregarLeadsDoFirestore();
+        // Carrega automaticamente os leads salvos do Realtime Database
+        carregarLeadsDoFirebase();
       } else {
         window.currentUser = null;
         document.getElementById('appContainer').classList.add('hidden');
