@@ -13,30 +13,36 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row">
 
-  <!-- 1. TELA DE LOGIN -->
+  <!-- 1. TELA DE AUTENTICAÇÃO (LOGIN / CADASTRO) -->
   <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
     <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
       <div class="text-center space-y-2">
         <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white font-bold text-xl mb-2">
           RP
         </div>
-        <h2 class="text-2xl font-bold text-white">Acessar RP Prospect</h2>
-        <p class="text-slate-400 text-sm">Plataforma Inteligente de Prospecção & CRM B2B</p>
+        <h2 id="authTitle" class="text-2xl font-bold text-white">Acessar RP Prospect</h2>
+        <p id="authSubtitle" class="text-slate-400 text-sm">Plataforma Inteligente de Prospecção & CRM B2B</p>
       </div>
 
-      <form id="loginForm" class="space-y-4" onsubmit="event.preventDefault(); fazerLogin();">
+      <form id="authForm" class="space-y-4" onsubmit="event.preventDefault(); submeterAuth();">
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
-          <input type="email" id="loginEmail" value="admin@rpprospect.com" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
+          <input type="email" id="loginEmail" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
-          <input type="password" id="loginSenha" value="123456" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
+          <input type="password" id="loginSenha" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
         </div>
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg transition-all shadow-lg shadow-indigo-600/30">
+        <button type="submit" id="btnSubmitAuth" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg transition-all shadow-lg shadow-indigo-600/30">
           Entrar no Sistema
         </button>
       </form>
+
+      <div class="text-center pt-2 border-t border-slate-800">
+        <button type="button" onclick="alternarModoAuth()" id="toggleAuthBtn" class="text-xs text-indigo-400 hover:underline">
+          Não tem uma conta? Cadastre-se aqui
+        </button>
+      </div>
     </div>
   </div>
 
@@ -74,11 +80,11 @@
       </div>
 
       <div class="pt-6 border-t border-slate-800">
-        <div class="flex items-center justify-between text-slate-400 text-xs mb-4">
-          <span>Status do Sistema</span>
+        <div class="flex items-center justify-between text-slate-400 text-xs mb-1">
+          <span id="userEmailDisplay" class="truncate max-w-[140px] text-slate-300"></span>
           <span class="inline-flex items-center text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> Online</span>
         </div>
-        <button onclick="fazerLogout()" class="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs font-medium border border-slate-800 hover:border-rose-900/50 transition-all">
+        <button onclick="fazerLogout()" class="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 rounded-lg text-xs font-medium border border-slate-800 hover:border-rose-900/50 transition-all">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           <span>Sair</span>
         </button>
@@ -132,6 +138,12 @@
           </div>
         </div>
 
+        <!-- RECURSO 5: HISTÓRICO DE BUSCAS RECENTES -->
+        <div id="searchHistoryWrapper" class="hidden bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Buscas Recentes:</span>
+          <div id="searchHistoryChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
         <div id="searchLoading" class="hidden text-center py-12 space-y-3">
           <div class="inline-block w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
           <p class="text-slate-400 text-sm">Consultando Google Maps e gerando inteligência comercial...</p>
@@ -170,6 +182,26 @@
             <i class="fa-solid fa-file-excel"></i>
             <span>Exportar CSV / Excel</span>
           </button>
+        </div>
+
+        <!-- RECURSO 3: METRICAS E DASHBOARD -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
+            <span class="text-xs text-slate-400 font-medium uppercase">Total de Leads</span>
+            <div id="statTotal" class="text-2xl font-bold text-white">0</div>
+          </div>
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
+            <span class="text-xs text-amber-400 font-medium uppercase">Em Contato</span>
+            <div id="statContact" class="text-2xl font-bold text-amber-400">0</div>
+          </div>
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
+            <span class="text-xs text-emerald-400 font-medium uppercase">Fechados / Ganhos</span>
+            <div id="statClosed" class="text-2xl font-bold text-emerald-400">0</div>
+          </div>
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
+            <span class="text-xs text-indigo-400 font-medium uppercase">Taxa de Conversão</span>
+            <div id="statRate" class="text-2xl font-bold text-indigo-400">0%</div>
+          </div>
         </div>
 
         <!-- FILTROS DO CRM -->
@@ -248,7 +280,7 @@
     </main>
   </div>
 
-  <!-- MODAL DE DETALHES, HISTÓRICO E ENCAMINHAMENTO -->
+  <!-- MODAL DE DETALHES COM DISPARO SEQUENCIAL -->
   <div id="modalDetails" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
       
@@ -257,9 +289,19 @@
           <h3 id="modalTitle" class="text-xl font-bold text-white">---</h3>
           <span id="modalSector" class="text-xs text-indigo-400">---</span>
         </div>
-        <button onclick="fecharModal()" class="text-slate-400 hover:text-white p-2">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        
+        <!-- RECURSO 4: DISPARO SEQUENCIAL (NAVEGAÇÃO) -->
+        <div class="flex items-center space-x-2">
+          <button onclick="navegarModal(-1)" title="Lead Anterior" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs border border-slate-700">
+            <i class="fa-solid fa-chevron-left"></i> Anterior
+          </button>
+          <button onclick="navegarModal(1)" title="Próximo Lead" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs border border-slate-700">
+            Próximo <i class="fa-solid fa-chevron-right"></i>
+          </button>
+          <button onclick="fecharModal()" class="text-slate-400 hover:text-white p-2 ml-2">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
       </div>
 
       <div class="space-y-4">
@@ -279,19 +321,17 @@
           </div>
         </div>
 
-        <!-- CAMPO DE ANOTAÇÕES / HISTÓRICO DO CLIENTE -->
         <div>
           <div class="flex items-center justify-between mb-1">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
               <i class="fa-solid fa-pen-to-square"></i>
               <span>Anotações & Histórico de Conversa</span>
             </h4>
-            <span class="text-[10px] text-slate-500">Salvo automaticamente ao fechar</span>
+            <span class="text-[10px] text-slate-500">Salvo no Firestore</span>
           </div>
-          <textarea id="modalNotes" rows="3" onchange="salvarAnotacaoLead(this.value)" placeholder="Escreva aqui observações (ex: Falei com o gerente no dia 10, pediu para retornar segunda-feira...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50"></textarea>
+          <textarea id="modalNotes" rows="3" onchange="salvarAnotacaoLead(this.value)" placeholder="Escreva observações aqui..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50"></textarea>
         </div>
 
-        <!-- MENSAGEM GERADA -->
         <div class="space-y-2 pt-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-400 flex items-center space-x-1.5">
@@ -308,15 +348,14 @@
         </div>
       </div>
 
-      <!-- BOTÕES DE AÇÃO -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800 pt-4">
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <a id="modalWhatsappBtn" href="#" target="_blank" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
+          <a id="modalWhatsappBtn" href="#" target="_blank" onclick="marcarComoEmContato()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
             <i class="fa-brands fa-whatsapp text-lg"></i>
             <span>Enviar no WhatsApp</span>
           </a>
           
-          <a id="modalEmailBtn" href="#" target="_blank" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/20">
+          <a id="modalEmailBtn" href="#" target="_blank" onclick="marcarComoEmContato()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/20">
             <i class="fa-regular fa-envelope text-lg"></i>
             <span>Enviar E-mail</span>
           </a>
@@ -330,10 +369,10 @@
     </div>
   </div>
 
+  <!-- SCRIPT PRINCIPAL DA APLICAÇÃO -->
   <script>
     const EDGE_FUNCTION_URL = "https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro";
 
-    // BANCO DE TEMPLATES
     let templates = {
       padrao: `Olá! Tudo bem? Falo com a equipe da {empresa}.\n\nAcompanho o trabalho de vocês no segmento de {setor} em {cidade} e percebi uma oportunidade incrível de colaborar com o crescimento comercial de vocês.\n\nOferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minutos para conversarmos esta semana?`,
       followup: `Olá! Passo por aqui para saber se conseguiram dar uma olhada na mensagem anterior sobre {proposta} para a {empresa}.\n\nContinuamos à disposição para agendar uma conversa rápida e apresentar as soluções para a região de {cidade}!`,
@@ -343,50 +382,18 @@
     let templateChaveAtual = 'padrao';
     let buscaAtual = [];
     let empresasSalvas = [];
+    let historicoBuscas = [];
     let empresaSelecionadaModal = null;
+    let indexModalAtual = null;
+    let origemModalAtual = null;
     let filtroAtualStatus = 'todos';
+    let isCadastroModo = false;
 
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('templateText').value = templates[templateChaveAtual];
-      atualizarTabelaSalvas();
     });
 
-    // AUTENTICAÇÃO
-    // AUTENTICAÇÃO REAL COM FIREBASE
-    async function fazerLogin() {
-      const email = document.getElementById('loginEmail').value;
-      const senha = document.getElementById('loginSenha').value;
-
-      try {
-        // Tenta autenticar no Firebase com o e-mail e senha informados
-        await window.signInWithEmailAndPassword(window.auth, email, senha);
-
-        // Se der certo, esconde a tela de login e exibe a aplicação
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('appContainer').classList.remove('hidden');
-      } catch (error) {
-        // Se a senha estiver errada ou o usuário não existir, cai aqui
-        alert('Erro ao fazer login: ' + error.message);
-      }
-    }
-
-    async function fazerLogout() {
-      try {
-        // Encerra a sessão no Firebase
-        await window.signOut(window.auth);
-
-        // Limpa a busca e reseta a tela
-        buscaAtual = [];
-        document.getElementById('searchResultsTable').innerHTML = '';
-        document.getElementById('resultsWrapper').classList.add('hidden');
-        document.getElementById('appContainer').classList.add('hidden');
-        document.getElementById('loginSection').classList.remove('hidden');
-      } catch (error) {
-        console.error('Erro ao fazer logout:', error);
-      }
-    }
-
-    // NAVEGAÇÃO
+    // 1. GERENCIAMENTO DE TELA E NAVEGAÇÃO
     function mudarAba(aba) {
       document.getElementById('abaBuscar').classList.add('hidden');
       document.getElementById('abaSalvas').classList.add('hidden');
@@ -408,18 +415,24 @@
       }
     }
 
-    // EXECUÇÃO DE BUSCA
-    async function executarBusca() {
-      const city = document.getElementById('searchCity').value;
-      const segment = document.getElementById('searchSegment').value;
+    // 2. BUSCA DE EMPRESAS & HISTÓRICO
+    async function executarBusca(cidadeParams = null, segmentoParams = null) {
+      const city = cidadeParams || document.getElementById('searchCity').value;
+      const segment = segmentoParams || document.getElementById('searchSegment').value;
 
       if (!city || !segment) {
         alert('Por favor, informe a Cidade e o Segmento.');
         return;
       }
 
+      document.getElementById('searchCity').value = city;
+      document.getElementById('searchSegment').value = segment;
+
       document.getElementById('searchLoading').classList.remove('hidden');
       document.getElementById('resultsWrapper').classList.add('hidden');
+
+      // Adicionar ao Histórico
+      adicionarHistoricoBusca(city, segment);
 
       try {
         const response = await fetch(EDGE_FUNCTION_URL, {
@@ -437,7 +450,7 @@
         let parsed = JSON.parse(data.result);
         buscaAtual = parsed.companies || [];
       } catch (err) {
-        console.warn("Edge function indisponível. Usando dados mock para o teste:", err.message);
+        console.warn("Edge function indisponível. Usando dados mock:", err.message);
         buscaAtual = [
           {
             nome: `${segment} Silva & Advogados`,
@@ -515,46 +528,116 @@
       document.getElementById('resultsWrapper').classList.add('hidden');
     }
 
-    // CARTEIRA DE EMPRESAS (CRM)
-    function guardarEmpresa(index) {
+    function adicionarHistoricoBusca(city, segment) {
+      const termo = `${segment} em ${city}`;
+      if (!historicoBuscas.includes(termo)) {
+        historicoBuscas.unshift(termo);
+        if (historicoBuscas.length > 5) historicoBuscas.pop();
+        
+        const wrapper = document.getElementById('searchHistoryWrapper');
+        const chipsContainer = document.getElementById('searchHistoryChips');
+        wrapper.classList.remove('hidden');
+        
+        chipsContainer.innerHTML = '';
+        historicoBuscas.forEach(item => {
+          chipsContainer.innerHTML += `
+            <button onclick="executarBusca('${city}', '${segment}')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 text-slate-300 text-xs px-3 py-1 rounded-lg transition-all">
+              ${item}
+            </button>
+          `;
+        });
+      }
+    }
+
+    // 3. CARTEIRA DE EMPRESAS (CRM & FIRESTORE)
+    async function guardarEmpresa(index) {
       const item = buscaAtual[index];
       const existe = empresasSalvas.some(e => e.nome === item.nome);
 
       if (!existe) {
-        // Inicializa com status padrão e anotações vazias
-        item.status = item.status || 'novo';
-        item.anotacoes = item.anotacoes || '';
-        empresasSalvas.push(item);
-        atualizarTabelaSalvas();
-        alert(`"${item.nome}" foi enviada para seu Funil de CRM!`);
+        const leadPayload = {
+          userId: window.currentUser.uid,
+          nome: item.nome,
+          setor: item.setor || 'Geral',
+          descricao: item.descricao || '',
+          site: item.site || '#',
+          telefones: item.telefones || [],
+          whatsapp: item.whatsapp || '',
+          email: item.email || '',
+          status: 'novo',
+          anotacoes: '',
+          criadoEm: new Date().toISOString()
+        };
+
+        try {
+          // Salva no Firestore
+          const docRef = await window.addDoc(window.collection(window.db, "leads"), leadPayload);
+          leadPayload.id = docRef.id;
+          empresasSalvas.push(leadPayload);
+          atualizarTabelaSalvas();
+          alert(`"${item.nome}" foi salva no seu Funil do Firestore!`);
+        } catch (err) {
+          console.error("Erro ao salvar no Firestore:", err);
+          alert("Erro ao salvar lead no banco de dados.");
+        }
       } else {
         alert('Esta empresa já está no seu Funil.');
       }
     }
 
-    function removerSalva(index) {
-      empresasSalvas.splice(index, 1);
+    async function carregarLeadsDoFirestore() {
+      if (!window.currentUser) return;
+      try {
+        const q = window.query(
+          window.collection(window.db, "leads"),
+          window.where("userId", "==", window.currentUser.uid)
+        );
+        const querySnapshot = await window.getDocs(q);
+        empresasSalvas = [];
+        querySnapshot.forEach((doc) => {
+          empresasSalvas.push({ id: doc.id, ...doc.data() });
+        });
+        atualizarTabelaSalvas();
+      } catch (err) {
+        console.error("Erro ao carregar leads:", err);
+      }
+    }
+
+    async function removerSalva(indexOriginal) {
+      const lead = empresasSalvas[indexOriginal];
+      if (lead && lead.id) {
+        try {
+          await window.deleteDoc(window.doc(window.db, "leads", lead.id));
+        } catch (err) {
+          console.error("Erro ao deletar lead:", err);
+        }
+      }
+      empresasSalvas.splice(indexOriginal, 1);
       atualizarTabelaSalvas();
     }
 
-    function alterarStatusLead(indexOriginal, novoStatus) {
+    async function alterarStatusLead(indexOriginal, novoStatus) {
       empresasSalvas[indexOriginal].status = novoStatus;
+      const lead = empresasSalvas[indexOriginal];
+      
+      if (lead && lead.id) {
+        try {
+          await window.updateDoc(window.doc(window.db, "leads", lead.id), { status: novoStatus });
+        } catch (err) {
+          console.error("Erro ao atualizar status:", err);
+        }
+      }
       atualizarTabelaSalvas();
     }
 
     function filtrarStatus(status) {
       filtroAtualStatus = status;
-
-      // Atualiza estilo dos botões de filtro
       ['todos', 'novo', 'em_contato', 'negociacao', 'fechado', 'sem_resposta'].forEach(st => {
         const btn = document.getElementById(`filterBtn-${st}`);
-        if (st === status) {
-          btn.className = "px-3 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition-all";
-        } else {
-          btn.className = "px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all";
-        }
+        btn.className = (st === status) 
+          ? "px-3 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition-all"
+          : "px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all";
       });
-
       atualizarTabelaSalvas();
     }
 
@@ -563,20 +646,19 @@
       const emptyState = document.getElementById('savedEmptyState');
       document.getElementById('badgeSaved').innerText = empresasSalvas.length;
 
-      tbody.innerHTML = '';
+      // Atualizar Métricas
+      atualizarMetricasCRM();
 
-      let listaFiltrada = empresasSalvas;
-      if (filtroAtualStatus !== 'todos') {
-        listaFiltrada = empresasSalvas.filter(e => e.status === filtroAtualStatus);
-      }
+      tbody.innerHTML = '';
+      let listaFiltrada = filtroAtualStatus === 'todos' 
+        ? empresasSalvas 
+        : empresasSalvas.filter(e => e.status === filtroAtualStatus);
 
       if (listaFiltrada.length === 0) {
         emptyState.classList.remove('hidden');
       } else {
         emptyState.classList.add('hidden');
-        
         listaFiltrada.forEach((empresa) => {
-          // Achar o índice real na matriz global para sincronizar
           const idxOriginal = empresasSalvas.findIndex(e => e.nome === empresa.nome);
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
 
@@ -610,22 +692,28 @@
       }
     }
 
+    function atualizarMetricasCRM() {
+      const total = empresasSalvas.length;
+      const emContato = empresasSalvas.filter(e => e.status === 'em_contato' || e.status === 'negociacao').length;
+      const fechados = empresasSalvas.filter(e => e.status === 'fechado').length;
+      const taxa = total > 0 ? Math.round((fechados / total) * 100) : 0;
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statContact').innerText = emContato;
+      document.getElementById('statClosed').innerText = fechados;
+      document.getElementById('statRate').innerText = `${taxa}%`;
+    }
+
     function exportarCSV() {
       if (empresasSalvas.length === 0) {
         alert('Sua lista de empresas no CRM está vazia.');
         return;
       }
-
-      let csv = '\uFEFF';
-      csv += 'Nome;Setor;Status;Telefone;Site;Anotacoes\n';
-
+      let csv = '\uFEFFNome;Setor;Status;Telefone;Site;Anotacoes\n';
       empresasSalvas.forEach(e => {
         const tel = (e.telefones && e.telefones.length > 0) ? e.telefones[0].telefone : 'N/A';
-        const site = e.site || 'N/A';
-        const st = e.status || 'novo';
         const notes = (e.anotacoes || '').replace(/;/g, ' ').replace(/\n/g, ' ');
-
-        csv += `"${e.nome}";"${e.setor}";"${st}";"${tel}";"${site}";"${notes}"\n`;
+        csv += `"${e.nome}";"${e.setor}";"${e.status || 'novo'}";"${tel}";"${e.site || 'N/A'}";"${notes}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -638,7 +726,7 @@
       document.body.removeChild(link);
     }
 
-    // GESTÃO DE TEMPLATES
+    // 4. TEMPLATES DE ABORDAGEM
     function trocarTemplate(chave) {
       templateChaveAtual = chave;
       document.getElementById('templateText').value = templates[chave];
@@ -649,9 +737,15 @@
       alert('Template atualizado com sucesso!');
     }
 
-    // MODAL DE DETALHES, ANOTAÇÕES E ENVIOS
-    async function abrirModal(index, origem) {
-      empresaSelecionadaModal = origem === 'busca' ? buscaAtual[index] : empresasSalvas[index];
+    // 5. MODAL DE DETALHES & DISPARO SEQUENCIAL
+    function abrirModal(index, origem) {
+      indexModalAtual = index;
+      origemModalAtual = origem;
+
+      const lista = origem === 'busca' ? buscaAtual : empresasSalvas;
+      empresaSelecionadaModal = lista[index];
+
+      if (!empresaSelecionadaModal) return;
 
       document.getElementById('modalTitle').innerText = empresaSelecionadaModal.nome;
       document.getElementById('modalSector').innerText = empresaSelecionadaModal.setor || 'Geral';
@@ -670,7 +764,6 @@
         siteElem.innerText = 'Não informado';
       }
 
-      // Preenchimento da Mensagem
       const city = document.getElementById('searchCity').value || 'sua cidade';
       const offering = document.getElementById('searchOffering').value || 'nossos serviços';
       const templateBase = templates[templateChaveAtual];
@@ -688,26 +781,46 @@
       const numClean = (empresaSelecionadaModal.whatsapp || telPrincipal).replace(/\D/g, '');
       const textEncoded = encodeURIComponent(mensagemFormatada);
       
-      if (numClean && numClean.length >= 8) {
-        waBtn.href = `https://wa.me/${numClean}?text=${textEncoded}`;
-      } else {
-        waBtn.href = `https://api.whatsapp.com/send?text=${textEncoded}`;
-      }
+      waBtn.href = (numClean && numClean.length >= 8)
+        ? `https://wa.me/${numClean}?text=${textEncoded}`
+        : `https://api.whatsapp.com/send?text=${textEncoded}`;
 
-      // Link do E-mail (mailto)
+      // Link do E-mail
       const emailBtn = document.getElementById('modalEmailBtn');
       const emailDestino = empresaSelecionadaModal.email || ''; 
       const assunto = encodeURIComponent(`Oportunidade de Parceria com a ${empresaSelecionadaModal.nome}`);
-      const corpoEmail = encodeURIComponent(mensagemFormatada);
-
-      emailBtn.href = `mailto:${emailDestino}?subject=${assunto}&body=${corpoEmail}`;
+      emailBtn.href = `mailto:${emailDestino}?subject=${assunto}&body=${textEncoded}`;
 
       document.getElementById('modalDetails').classList.remove('hidden');
     }
 
-    function salvarAnotacaoLead(texto) {
+    function navegarModal(direcao) {
+      const lista = origemModalAtual === 'busca' ? buscaAtual : empresasSalvas;
+      const novoIndex = indexModalAtual + direcao;
+
+      if (novoIndex >= 0 && novoIndex < lista.length) {
+        abrirModal(novoIndex, origemModalAtual);
+      } else {
+        alert(direcao > 0 ? "Você chegou ao fim da lista!" : "Este é o primeiro lead da lista.");
+      }
+    }
+
+    async function marcarComoEmContato() {
+      if (origemModalAtual === 'salvas' && empresaSelecionadaModal) {
+        alterarStatusLead(indexModalAtual, 'em_contato');
+      }
+    }
+
+    async function salvarAnotacaoLead(texto) {
       if (empresaSelecionadaModal) {
         empresaSelecionadaModal.anotacoes = texto;
+        if (empresaSelecionadaModal.id) {
+          try {
+            await window.updateDoc(window.doc(window.db, "leads", empresaSelecionadaModal.id), { anotacoes: texto });
+          } catch(e) {
+            console.error("Erro ao atualizar anotações no Firestore:", e);
+          }
+        }
       }
     }
 
@@ -727,80 +840,72 @@
         copyTextSpan.innerText = "Copiar Mensagem";
       }, 2000);
     }
-    
-const siteElem = document.getElementById('modalWebsite');
-      if (empresaSelecionadaModal.site && empresaSelecionadaModal.site !== '#') {
-        siteElem.innerHTML = `<a href="${empresaSelecionadaModal.site}" target="_blank" class="hover:underline flex items-center space-x-1"><i class="fa-solid fa-globe text-xs mr-1"></i>${empresaSelecionadaModal.site}</a>`;
+
+    // 6. AUTENTICAÇÃO COM FIREBASE (LOGIN / CADASTRO)
+    function alternarModoAuth() {
+      isCadastroModo = !isCadastroModo;
+      const title = document.getElementById('authTitle');
+      const btn = document.getElementById('btnSubmitAuth');
+      const toggle = document.getElementById('toggleAuthBtn');
+
+      if (isCadastroModo) {
+        title.innerText = "Criar Conta no RP Prospect";
+        btn.innerText = "Cadastrar e Entrar";
+        toggle.innerText = "Já tem uma conta? Faça login aqui";
       } else {
-        siteElem.innerText = 'Não informado';
-      }
-
-      // Preenchimento da Mensagem
-      const city = document.getElementById('searchCity').value || 'sua cidade';
-      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
-      const templateBase = templates[templateChaveAtual];
-
-      let mensagemFormatada = templateBase
-        .replace(/{empresa}/g, empresaSelecionadaModal.nome)
-        .replace(/{setor}/g, empresaSelecionadaModal.setor || 'seu segmento')
-        .replace(/{cidade}/g, city)
-        .replace(/{proposta}/g, offering);
-
-      document.getElementById('modalMsgText').value = mensagemFormatada;
-
-      // Link do WhatsApp
-      const waBtn = document.getElementById('modalWhatsappBtn');
-      const numClean = (empresaSelecionadaModal.whatsapp || telPrincipal).replace(/\D/g, '');
-      const textEncoded = encodeURIComponent(mensagemFormatada);
-      
-      if (numClean && numClean.length >= 8) {
-        waBtn.href = `https://wa.me/${numClean}?text=${textEncoded}`;
-      } else {
-        waBtn.href = `https://api.whatsapp.com/send?text=${textEncoded}`;
-      }
-
-      // Link do E-mail (mailto)
-      const emailBtn = document.getElementById('modalEmailBtn');
-      const emailDestino = empresaSelecionadaModal.email || ''; 
-      const assunto = encodeURIComponent(`Oportunidade de Parceria com a ${empresaSelecionadaModal.nome}`);
-      const corpoEmail = encodeURIComponent(mensagemFormatada);
-
-      emailBtn.href = `mailto:${emailDestino}?subject=${assunto}&body=${corpoEmail}`;
-
-      document.getElementById('modalDetails').classList.remove('hidden');
-    }
-
-    function salvarAnotacaoLead(texto) {
-      if (empresaSelecionadaModal) {
-        empresaSelecionadaModal.anotacoes = texto;
+        title.innerText = "Acessar RP Prospect";
+        btn.innerText = "Entrar no Sistema";
+        toggle.innerText = "Não tem uma conta? Cadastre-se aqui";
       }
     }
 
-    function fecharModal() {
-      document.getElementById('modalDetails').classList.add('hidden');
-      document.getElementById('copyMsgText').innerText = "Copiar Mensagem";
+    async function submeterAuth() {
+      const email = document.getElementById('loginEmail').value;
+      const senha = document.getElementById('loginSenha').value;
+
+      try {
+        if (isCadastroModo) {
+          await window.createUserWithEmailAndPassword(window.auth, email, senha);
+          alert("Conta criada com sucesso!");
+        } else {
+          await window.signInWithEmailAndPassword(window.auth, email, senha);
+        }
+      } catch (error) {
+        alert("Erro na autenticação: " + error.message);
+      }
     }
 
-    function copiarMensagem() {
-      const txt = document.getElementById('modalMsgText');
-      txt.select();
-      navigator.clipboard.writeText(txt.value);
-      
-      const copyTextSpan = document.getElementById('copyMsgText');
-      copyTextSpan.innerText = "Copiado!";
-      setTimeout(() => {
-        copyTextSpan.innerText = "Copiar Mensagem";
-      }, 2000);
+    async function fazerLogout() {
+      try {
+        await window.signOut(window.auth);
+      } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+      }
     }
   </script>
 
-  <!-- SDKs do Firebase (via CDN para funcionar direto no navegador) -->
+  <!-- SDKs DO FIREBASE VIA CDN (MODULE) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      doc, 
+      updateDoc, 
+      deleteDoc, 
+      query, 
+      where 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Suas credenciais reais do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBYlR6csHhWNoJKpFTD0d8ZArEiTwH3G8s",
       authDomain: "rppro-23053.firebaseapp.com",
@@ -811,16 +916,41 @@ const siteElem = document.getElementById('modalWebsite');
       measurementId: "G-F5PNLMFF2W"
     };
 
-    // Inicializa o Firebase
     const app = initializeApp(firebaseConfig);
-    
-    // Disponibiliza as ferramentas globalmente
-    window.auth = getAuth(app);
-    window.db = getFirestore(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Disponibilizando no escopo global para o JavaScript tradicional usar
+    window.auth = auth;
+    window.db = db;
     window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
     window.signOut = signOut;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.getDocs = getDocs;
+    window.doc = doc;
+    window.updateDoc = updateDoc;
+    window.deleteDoc = deleteDoc;
+    window.query = query;
+    window.where = where;
+
+    // Listener de Sessão (Realtime State)
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.currentUser = user;
+        document.getElementById('userEmailDisplay').innerText = user.email;
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('appContainer').classList.remove('hidden');
+        
+        // Carrega automaticamente os leads que este usuário salvou no Firestore
+        carregarLeadsDoFirestore();
+      } else {
+        window.currentUser = null;
+        document.getElementById('appContainer').classList.add('hidden');
+        document.getElementById('loginSection').classList.remove('hidden');
+      }
+    });
   </script>
-</body>
-</html>
 </body>
 </html>
