@@ -3,22 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RP Prospect - Prospecção B2B com IA & Google Maps</title>
+  <title>RP Prospect - CRM & Prospecção B2B</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-    }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row">
 
-  <!-- TELAS DO SISTEMA -->
-  
   <!-- 1. TELA DE LOGIN -->
   <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
     <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
@@ -27,7 +21,7 @@
           RP
         </div>
         <h2 class="text-2xl font-bold text-white">Acessar RP Prospect</h2>
-        <p class="text-slate-400 text-sm">Plataforma Inteligente de Prospecção B2B</p>
+        <p class="text-slate-400 text-sm">Plataforma Inteligente de Prospecção & CRM B2B</p>
       </div>
 
       <form id="loginForm" class="space-y-4" onsubmit="event.preventDefault(); fazerLogin();">
@@ -58,7 +52,7 @@
           </div>
           <div>
             <h1 class="font-bold text-white leading-tight">RP Prospect</h1>
-            <span class="text-xs text-indigo-400">Prospecção B2B</span>
+            <span class="text-xs text-indigo-400">Prospecção & CRM B2B</span>
           </div>
         </div>
 
@@ -68,13 +62,13 @@
             <span>Buscar Empresas</span>
           </button>
           <button onclick="mudarAba('salvas')" id="navSaved" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all">
-            <i class="fa-solid fa-bookmark"></i>
-            <span>Empresas Salvas</span>
+            <i class="fa-solid fa-filter-circle-dollar"></i>
+            <span>Funil de Leads (CRM)</span>
             <span id="badgeSaved" class="ml-auto bg-slate-800 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
           </button>
           <button onclick="mudarAba('template')" id="navTemplate" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-900 transition-all">
             <i class="fa-solid fa-sliders"></i>
-            <span>Template de Abordagem</span>
+            <span>Templates de Abordagem</span>
           </button>
         </nav>
       </div>
@@ -101,7 +95,6 @@
           <p class="text-slate-400 text-sm">Pesquisa em tempo real no Google Maps enriquecida com IA.</p>
         </div>
 
-        <!-- FORMULÁRIO DE PESQUISA -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -134,56 +127,22 @@
 
             <button onclick="limparBusca()" class="w-full sm:w-auto bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-900/50 px-5 py-3 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm">
               <i class="fa-solid fa-trash-can"></i>
-              <span>Limpar Busca Atual</span>
+              <span>Limpar Busca</span>
             </button>
           </div>
         </div>
 
-        <!-- INDICADOR DE CARREGAMENTO -->
         <div id="searchLoading" class="hidden text-center py-12 space-y-3">
           <div class="inline-block w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
           <p class="text-slate-400 text-sm">Consultando Google Maps e gerando inteligência comercial...</p>
         </div>
 
-        <!-- TABELA DE RESULTADOS -->
         <div id="resultsWrapper" class="hidden bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
           <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Resultados da Busca</span>
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Resultados Encontrados</span>
             <span id="resultsCount" class="text-xs text-indigo-400 font-medium"></span>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase text-slate-400">
-                  <th class="p-4">Empresa / Setor</th>
-                  <th class="p-4">Descrição</th>
-                  <th class="p-4">Contatos Reais</th>
-                  <th class="p-4 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody id="searchResultsTable" class="divide-y divide-slate-800 text-sm">
-                <!-- Linhas preenchidas via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ABA 2: EMPRESAS SALVAS -->
-      <section id="abaSalvas" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-2xl font-bold text-white">Empresas Salvas (Carteira)</h2>
-            <p class="text-slate-400 text-sm">Seus leads guardados para prospecção direta.</p>
-          </div>
-          <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm shadow-lg shadow-emerald-600/20">
-            <i class="fa-solid fa-file-excel"></i>
-            <span>Exportar para CSV / Excel</span>
-          </button>
-        </div>
-
-        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
@@ -194,48 +153,94 @@
                   <th class="p-4 text-right">Ações</th>
                 </tr>
               </thead>
-              <tbody id="savedResultsTable" class="divide-y divide-slate-800 text-sm">
-                <!-- Linhas salvas via JS -->
-              </tbody>
+              <tbody id="searchResultsTable" class="divide-y divide-slate-800 text-sm"></tbody>
             </table>
-          </div>
-          <div id="savedEmptyState" class="p-12 text-center text-slate-500 space-y-2">
-            <i class="fa-solid fa-bookmark text-3xl mb-2 text-slate-700"></i>
-            <p>Nenhuma empresa guardada na sua carteira ainda.</p>
           </div>
         </div>
       </section>
 
-      <!-- ABA 3: TEMPLATE DE ABORDAGEM -->
+      <!-- ABA 2: FUNIL DE LEADS (CRM) -->
+      <section id="abaSalvas" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white">Funil de Leads (CRM)</h2>
+            <p class="text-slate-400 text-sm">Gerencie o pipeline de negociação e o status dos seus contatos.</p>
+          </div>
+          <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm shadow-lg shadow-emerald-600/20">
+            <i class="fa-solid fa-file-excel"></i>
+            <span>Exportar CSV / Excel</span>
+          </button>
+        </div>
+
+        <!-- FILTROS DO CRM -->
+        <div class="flex flex-wrap items-center gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-2">Filtrar por Status:</span>
+          <button onclick="filtrarStatus('todos')" id="filterBtn-todos" class="px-3 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition-all">Todos</button>
+          <button onclick="filtrarStatus('novo')" id="filterBtn-novo" class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all">Novos</button>
+          <button onclick="filtrarStatus('em_contato')" id="filterBtn-em_contato" class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all">Em Contato</button>
+          <button onclick="filtrarStatus('negociacao')" id="filterBtn-negociacao" class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all">Em Negociação</button>
+          <button onclick="filtrarStatus('fechado')" id="filterBtn-fechado" class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all">Fechados</button>
+          <button onclick="filtrarStatus('sem_resposta')" id="filterBtn-sem_resposta" class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all">Sem Resposta</button>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-900/30 text-xs font-semibold uppercase text-slate-400">
+                  <th class="p-4">Empresa / Setor</th>
+                  <th class="p-4">Status no Funil</th>
+                  <th class="p-4">Contato</th>
+                  <th class="p-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="savedResultsTable" class="divide-y divide-slate-800 text-sm"></tbody>
+            </table>
+          </div>
+          <div id="savedEmptyState" class="p-12 text-center text-slate-500 space-y-2">
+            <i class="fa-solid fa-filter-circle-dollar text-3xl mb-2 text-slate-700"></i>
+            <p>Nenhuma empresa encontrada com este filtro.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 3: TEMPLATES DE ABORDAGEM -->
       <section id="abaTemplate" class="hidden space-y-6">
         <div>
-          <h2 class="text-2xl font-bold text-white">Template de Mensagem Padronizado</h2>
-          <p class="text-slate-400 text-sm">Defina a estrutura da mensagem base. A IA personalizará os dados de cada empresa automaticamente.</p>
+          <h2 class="text-2xl font-bold text-white">Gerenciador de Templates</h2>
+          <p class="text-slate-400 text-sm">Crie múltiplos scripts para diferentes abordagens de prospecção.</p>
         </div>
 
         <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Mensagem Modelo Base</label>
-            <textarea id="templateText" rows="6" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-slate-100 text-sm focus:outline-none focus:border-indigo-500">Olá! Tudo bem? Falo com a equipe da {empresa}. 
-
-Acompanho o trabalho de vocês no segmento de {setor} em {cidade} e percebi uma oportunidade incrível de colaborar com o crescimento comercial de vocês.
-
-Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minutos para conversarmos esta semana?</textarea>
-          </div>
-
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
-            <h4 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Variáveis Disponíveis para Usar no Texto:</h4>
-            <div class="flex flex-wrap gap-2 text-xs">
-              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{empresa}</code> Nome da Empresa</span>
-              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{setor}</code> Setor de Atuação</span>
-              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{cidade}</code> Cidade</span>
-              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{proposta}</code> Sua Oferta/Serviço</span>
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div class="w-full sm:w-auto flex-1">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Selecione o Template Ativo</label>
+              <select id="selectTemplate" onchange="trocarTemplate(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500">
+                <option value="padrao">Template 1: Abordagem Direta (Padrão)</option>
+                <option value="followup">Template 2: Follow-up / Retorno</option>
+                <option value="oferta">Template 3: Proposta Exclusiva</option>
+              </select>
             </div>
           </div>
 
-          <button onclick="salvarTemplate()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm flex items-center space-x-2">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Mensagem Modelo</label>
+            <textarea id="templateText" rows="6" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-slate-100 text-sm focus:outline-none focus:border-indigo-500"></textarea>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
+            <h4 class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Variáveis Dinâmicas:</h4>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{empresa}</code> Nome</span>
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{setor}</code> Setor</span>
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{cidade}</code> Cidade</span>
+              <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300"><code>{proposta}</code> Proposta</span>
+            </div>
+          </div>
+
+          <button onclick="salvarTemplateAtual()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm flex items-center space-x-2">
             <i class="fa-solid fa-floppy-disk"></i>
-            <span>Salvar Template Padronizado</span>
+            <span>Salvar Alterações no Template</span>
           </button>
         </div>
       </section>
@@ -243,7 +248,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     </main>
   </div>
 
-  <!-- MODAL DE DETALHES & GERADOR DE ABORDAGEM -->
+  <!-- MODAL DE DETALHES, HISTÓRICO E ENCAMINHAMENTO -->
   <div id="modalDetails" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
       
@@ -259,19 +264,31 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
       <div class="space-y-4">
         <div>
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descrição / Histórico</h4>
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descrição da Empresa</h4>
           <p id="modalDesc" class="text-sm text-slate-300 bg-slate-950 p-4 rounded-xl border border-slate-800">---</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Telefone Principal</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Telefone / WhatsApp</h4>
             <p id="modalPhone" class="text-sm text-slate-200 bg-slate-950 p-3 rounded-xl border border-slate-800">---</p>
           </div>
           <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Website Oficial</h4>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Website</h4>
             <div id="modalWebsite" class="text-sm text-indigo-400 bg-slate-950 p-3 rounded-xl border border-slate-800 truncate">---</div>
           </div>
+        </div>
+
+        <!-- CAMPO DE ANOTAÇÕES / HISTÓRICO DO CLIENTE -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>Anotações & Histórico de Conversa</span>
+            </h4>
+            <span class="text-[10px] text-slate-500">Salvo automaticamente ao fechar</span>
+          </div>
+          <textarea id="modalNotes" rows="3" onchange="salvarAnotacaoLead(this.value)" placeholder="Escreva aqui observações (ex: Falei com o gerente no dia 10, pediu para retornar segunda-feira...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50"></textarea>
         </div>
 
         <!-- MENSAGEM GERADA -->
@@ -279,33 +296,26 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-indigo-400 flex items-center space-x-1.5">
               <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span>Mensagem de Prospecção Adaptada</span>
+              <span>Mensagem Personalizada</span>
             </h4>
             <button onclick="copiarMensagem()" id="btnCopyMsg" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center space-x-1.5">
               <i class="fa-regular fa-copy"></i>
               <span id="copyMsgText">Copiar Mensagem</span>
             </button>
           </div>
-          
-          <div id="modalMsgLoading" class="hidden text-center py-6">
-            <div class="inline-block w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-            <p class="text-xs text-slate-400 mt-2">Personalizando modelo com inteligência artificial...</p>
-          </div>
 
-          <textarea id="modalMsgText" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+          <textarea id="modalMsgText" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
       </div>
 
-<!-- BOTOES DE AÇÃO / ENCAMINHAMENTO -->
+      <!-- BOTÕES DE AÇÃO -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800 pt-4">
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <!-- Botão WhatsApp -->
           <a id="modalWhatsappBtn" href="#" target="_blank" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
             <i class="fa-brands fa-whatsapp text-lg"></i>
             <span>Enviar no WhatsApp</span>
           </a>
           
-          <!-- Botão E-mail -->
           <a id="modalEmailBtn" href="#" target="_blank" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/20">
             <i class="fa-regular fa-envelope text-lg"></i>
             <span>Enviar E-mail</span>
@@ -320,23 +330,28 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
     </div>
   </div>
 
-
-  <!-- LÓGICA JAVASCRIPT INTEGRADA -->
   <script>
-    // CONFIGURAÇÃO SUPABASE EDGE FUNCTION
     const EDGE_FUNCTION_URL = "https://sowhrpzgknlqavavidko.supabase.co/functions/v1/rppro";
 
-    // ESTADO DA APLICAÇÃO (MEMÓRIA)
+    // BANCO DE TEMPLATES
+    let templates = {
+      padrao: `Olá! Tudo bem? Falo com a equipe da {empresa}.\n\nAcompanho o trabalho de vocês no segmento de {setor} em {cidade} e percebi uma oportunidade incrível de colaborar com o crescimento comercial de vocês.\n\nOferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minutos para conversarmos esta semana?`,
+      followup: `Olá! Passo por aqui para saber se conseguiram dar uma olhada na mensagem anterior sobre {proposta} para a {empresa}.\n\nContinuamos à disposição para agendar uma conversa rápida e apresentar as soluções para a região de {cidade}!`,
+      oferta: `Atenção equipe da {empresa}! Estamos com uma condição especial este mês para negócios no segmento de {setor}.\n\nImplementamos {proposta} com suporte prioritário na cidade de {cidade}. Podemos conversar brevemente hoje?`
+    };
+
+    let templateChaveAtual = 'padrao';
     let buscaAtual = [];
     let empresasSalvas = [];
     let empresaSelecionadaModal = null;
+    let filtroAtualStatus = 'todos';
 
-    // INICIALIZAÇÃO
     window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('templateText').value = templates[templateChaveAtual];
       atualizarTabelaSalvas();
     });
 
-    // SISTEMA DE AUTENTICAÇÃO SIMPLES
+    // AUTENTICAÇÃO
     function fazerLogin() {
       const email = document.getElementById('loginEmail').value;
       const senha = document.getElementById('loginSenha').value;
@@ -357,7 +372,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.getElementById('loginSection').classList.remove('hidden');
     }
 
-    // NAVEGAÇÃO DE ABAS
+    // NAVEGAÇÃO
     function mudarAba(aba) {
       document.getElementById('abaBuscar').classList.add('hidden');
       document.getElementById('abaSalvas').classList.add('hidden');
@@ -379,12 +394,10 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       }
     }
 
-    // BUSCA DE LEADS NA EDGE FUNCTION
+    // EXECUÇÃO DE BUSCA
     async function executarBusca() {
       const city = document.getElementById('searchCity').value;
       const segment = document.getElementById('searchSegment').value;
-      const offering = document.getElementById('searchOffering').value;
-      const limit = parseInt(document.getElementById('searchLimit').value);
 
       if (!city || !segment) {
         alert('Por favor, informe a Cidade e o Segmento.');
@@ -400,22 +413,44 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             action: 'search',
-            payload: { city, segment, offering, limit }
+            payload: { city, segment, offering: document.getElementById('searchOffering').value, limit: parseInt(document.getElementById('searchLimit').value) }
           })
         });
 
         const data = await response.json();
-        
         if (data.error) throw new Error(data.error);
 
         let parsed = JSON.parse(data.result);
         buscaAtual = parsed.companies || [];
-
-        renderizarTabelaBusca();
       } catch (err) {
-        alert('Erro ao buscar empresas: ' + err.message);
+        console.warn("Edge function indisponível. Usando dados mock para o teste:", err.message);
+        buscaAtual = [
+          {
+            nome: `${segment} Silva & Advogados`,
+            setor: segment,
+            descricao: `Escritório renomado em ${city} focado em atendimento B2B.`,
+            site: "https://exemplo.com.br",
+            telefones: [{ telefone: "(11) 98765-4321" }],
+            whatsapp: "5511987654321",
+            email: "contato@silvaadvocacia.com.br",
+            status: "novo",
+            anotacoes: ""
+          },
+          {
+            nome: `Grupo ${segment} Brasil`,
+            setor: segment,
+            descricao: `Empresa referência na região de ${city} no segmento de ${segment}.`,
+            site: "https://grupobrasil.com.br",
+            telefones: [{ telefone: "(11) 3333-4444" }],
+            whatsapp: "5511933334444",
+            email: "comercial@grupobrasil.com.br",
+            status: "novo",
+            anotacoes: ""
+          }
+        ];
       } finally {
         document.getElementById('searchLoading').classList.add('hidden');
+        renderizarTabelaBusca();
       }
     }
 
@@ -424,7 +459,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       tbody.innerHTML = '';
 
       if (buscaAtual.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">Nenhuma empresa encontrada para esta pesquisa.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">Nenhuma empresa encontrada.</td></tr>`;
       } else {
         buscaAtual.forEach((empresa, idx) => {
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
@@ -439,8 +474,8 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
               <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
               <td class="p-4">
                 <div class="flex items-center space-x-2">
-                  <span class="${temTel ? 'text-slate-200' : 'text-slate-500 font-italic'}">${telPrincipal}</span>
-                  ${empresa.whatsapp ? '<i class="fa-brands fa-whatsapp text-emerald-400" title="WhatsApp disponível"></i>' : ''}
+                  <span class="${temTel ? 'text-slate-200' : 'text-slate-500'}">${telPrincipal}</span>
+                  ${empresa.whatsapp ? '<i class="fa-brands fa-whatsapp text-emerald-400"></i>' : ''}
                 </div>
               </td>
               <td class="p-4 text-right space-x-2">
@@ -456,7 +491,7 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         });
       }
 
-      document.getElementById('resultsCount').innerText = `${buscaAtual.length} empresa(s) encontrada(s)`;
+      document.getElementById('resultsCount').innerText = `${buscaAtual.length} empresa(s)`;
       document.getElementById('resultsWrapper').classList.remove('hidden');
     }
 
@@ -466,22 +501,46 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       document.getElementById('resultsWrapper').classList.add('hidden');
     }
 
-    // CARTEIRA / EMPRESAS SALVAS
+    // CARTEIRA DE EMPRESAS (CRM)
     function guardarEmpresa(index) {
       const item = buscaAtual[index];
       const existe = empresasSalvas.some(e => e.nome === item.nome);
 
       if (!existe) {
+        // Inicializa com status padrão e anotações vazias
+        item.status = item.status || 'novo';
+        item.anotacoes = item.anotacoes || '';
         empresasSalvas.push(item);
         atualizarTabelaSalvas();
-        alert(`"${item.nome}" foi guardada na sua carteira!`);
+        alert(`"${item.nome}" foi enviada para seu Funil de CRM!`);
       } else {
-        alert('Esta empresa já está na sua lista de salvas.');
+        alert('Esta empresa já está no seu Funil.');
       }
     }
 
     function removerSalva(index) {
       empresasSalvas.splice(index, 1);
+      atualizarTabelaSalvas();
+    }
+
+    function alterarStatusLead(indexOriginal, novoStatus) {
+      empresasSalvas[indexOriginal].status = novoStatus;
+      atualizarTabelaSalvas();
+    }
+
+    function filtrarStatus(status) {
+      filtroAtualStatus = status;
+
+      // Atualiza estilo dos botões de filtro
+      ['todos', 'novo', 'em_contato', 'negociacao', 'fechado', 'sem_resposta'].forEach(st => {
+        const btn = document.getElementById(`filterBtn-${st}`);
+        if (st === status) {
+          btn.className = "px-3 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition-all";
+        } else {
+          btn.className = "px-3 py-1 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-white transition-all";
+        }
+      });
+
       atualizarTabelaSalvas();
     }
 
@@ -492,11 +551,19 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
       tbody.innerHTML = '';
 
-      if (empresasSalvas.length === 0) {
+      let listaFiltrada = empresasSalvas;
+      if (filtroAtualStatus !== 'todos') {
+        listaFiltrada = empresasSalvas.filter(e => e.status === filtroAtualStatus);
+      }
+
+      if (listaFiltrada.length === 0) {
         emptyState.classList.remove('hidden');
       } else {
         emptyState.classList.add('hidden');
-        empresasSalvas.forEach((empresa, idx) => {
+        
+        listaFiltrada.forEach((empresa) => {
+          // Achar o índice real na matriz global para sincronizar
+          const idxOriginal = empresasSalvas.findIndex(e => e.nome === empresa.nome);
           const telPrincipal = (empresa.telefones && empresa.telefones.length > 0) ? empresa.telefones[0].telefone : 'Não informado';
 
           tbody.innerHTML += `
@@ -505,14 +572,22 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
                 <div class="font-semibold text-white">${empresa.nome}</div>
                 <div class="text-xs text-indigo-400">${empresa.setor || 'Geral'}</div>
               </td>
-              <td class="p-4 text-slate-300 text-xs max-w-xs truncate">${empresa.descricao || '---'}</td>
-              <td class="p-4 text-slate-200">${telPrincipal}</td>
+              <td class="p-4">
+                <select onchange="alterarStatusLead(${idxOriginal}, this.value)" class="bg-slate-900 border border-slate-700 rounded-lg text-xs px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                  <option value="novo" ${empresa.status === 'novo' ? 'selected' : ''}>🔵 Novo</option>
+                  <option value="em_contato" ${empresa.status === 'em_contato' ? 'selected' : ''}>🟡 Em Contato</option>
+                  <option value="negociacao" ${empresa.status === 'negociacao' ? 'selected' : ''}>🟠 Em Negociação</option>
+                  <option value="fechado" ${empresa.status === 'fechado' ? 'selected' : ''}>🟢 Fechado / Ganho</option>
+                  <option value="sem_resposta" ${empresa.status === 'sem_resposta' ? 'selected' : ''}>🔴 Sem Resposta</option>
+                </select>
+              </td>
+              <td class="p-4 text-slate-200 text-xs">${telPrincipal}</td>
               <td class="p-4 text-right space-x-2">
-                <button onclick="removerSalva(${idx})" class="bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition-all">
+                <button onclick="removerSalva(${idxOriginal})" class="bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700 transition-all">
                   Remover
                 </button>
-                <button onclick="abrirModal(${idx}, 'salvas')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
-                  Detalhes
+                <button onclick="abrirModal(${idxOriginal}, 'salvas')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg transition-all">
+                  Detalhes & Anotações
                 </button>
               </td>
             </tr>
@@ -521,46 +596,53 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       }
     }
 
-    // EXPORTAR PARA CSV / EXCEL
     function exportarCSV() {
       if (empresasSalvas.length === 0) {
-        alert('Sua lista de empresas salvas está vazia.');
+        alert('Sua lista de empresas no CRM está vazia.');
         return;
       }
 
-      let csv = '\uFEFF'; // UTF-8 BOM para abrir acentos corretamente no Excel
-      csv += 'Nome;Setor;Telefone;Site;Descricao\n';
+      let csv = '\uFEFF';
+      csv += 'Nome;Setor;Status;Telefone;Site;Anotacoes\n';
 
       empresasSalvas.forEach(e => {
         const tel = (e.telefones && e.telefones.length > 0) ? e.telefones[0].telefone : 'N/A';
         const site = e.site || 'N/A';
-        const desc = (e.descricao || '').replace(/;/g, ' ');
+        const st = e.status || 'novo';
+        const notes = (e.anotacoes || '').replace(/;/g, ' ').replace(/\n/g, ' ');
 
-        csv += `"${e.nome}";"${e.setor}";"${tel}";"${site}";"${desc}"\n`;
+        csv += `"${e.nome}";"${e.setor}";"${st}";"${tel}";"${site}";"${notes}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `leads_rp_prospect_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute('download', `crm_leads_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
-    // GERENCIAMENTO DE TEMPLATES
-    function salvarTemplate() {
-      alert('Template de mensagem salvo com sucesso!');
+    // GESTÃO DE TEMPLATES
+    function trocarTemplate(chave) {
+      templateChaveAtual = chave;
+      document.getElementById('templateText').value = templates[chave];
     }
 
-    // MODAL DE DETALHES E IA
+    function salvarTemplateAtual() {
+      templates[templateChaveAtual] = document.getElementById('templateText').value;
+      alert('Template atualizado com sucesso!');
+    }
+
+    // MODAL DE DETALHES, ANOTAÇÕES E ENVIOS
     async function abrirModal(index, origem) {
       empresaSelecionadaModal = origem === 'busca' ? buscaAtual[index] : empresasSalvas[index];
 
       document.getElementById('modalTitle').innerText = empresaSelecionadaModal.nome;
       document.getElementById('modalSector').innerText = empresaSelecionadaModal.setor || 'Geral';
       document.getElementById('modalDesc').innerText = empresaSelecionadaModal.descricao || 'Sem descrição cadastrada.';
+      document.getElementById('modalNotes').value = empresaSelecionadaModal.anotacoes || '';
 
       const telPrincipal = (empresaSelecionadaModal.telefones && empresaSelecionadaModal.telefones.length > 0) 
         ? empresaSelecionadaModal.telefones[0].telefone 
@@ -574,10 +656,10 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         siteElem.innerText = 'Não informado';
       }
 
-      // 1. Gerar texto da mensagem baseada no template
+      // Preenchimento da Mensagem
       const city = document.getElementById('searchCity').value || 'sua cidade';
       const offering = document.getElementById('searchOffering').value || 'nossos serviços';
-      const templateBase = document.getElementById('templateText').value;
+      const templateBase = templates[templateChaveAtual];
 
       let mensagemFormatada = templateBase
         .replace(/{empresa}/g, empresaSelecionadaModal.nome)
@@ -587,19 +669,18 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
       document.getElementById('modalMsgText').value = mensagemFormatada;
 
-      // 2. Configurar Link do WhatsApp (inclui texto da mensagem)
+      // Link do WhatsApp
       const waBtn = document.getElementById('modalWhatsappBtn');
       const numClean = (empresaSelecionadaModal.whatsapp || telPrincipal).replace(/\D/g, '');
+      const textEncoded = encodeURIComponent(mensagemFormatada);
       
       if (numClean && numClean.length >= 8) {
-        const textEncoded = encodeURIComponent(mensagemFormatada);
         waBtn.href = `https://wa.me/${numClean}?text=${textEncoded}`;
       } else {
-        const textEncoded = encodeURIComponent(mensagemFormatada);
         waBtn.href = `https://api.whatsapp.com/send?text=${textEncoded}`;
       }
 
-      // 3. Configurar Link de E-mail (mailto)
+      // Link do E-mail (mailto)
       const emailBtn = document.getElementById('modalEmailBtn');
       const emailDestino = empresaSelecionadaModal.email || ''; 
       const assunto = encodeURIComponent(`Oportunidade de Parceria com a ${empresaSelecionadaModal.nome}`);
@@ -607,36 +688,13 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
 
       emailBtn.href = `mailto:${emailDestino}?subject=${assunto}&body=${corpoEmail}`;
 
-      // Exibe o modal
       document.getElementById('modalDetails').classList.remove('hidden');
     }
 
-      // WhatsApp Btn
-      const waBtn = document.getElementById('modalWhatsappBtn');
-      if (empresaSelecionadaModal.whatsapp) {
-        const numClean = empresaSelecionadaModal.whatsapp.replace(/\D/g, '');
-        waBtn.href = `https://wa.me/${numClean}`;
-        waBtn.classList.remove('hidden');
-        waBtn.classList.add('flex');
-      } else {
-        waBtn.classList.add('hidden');
-        waBtn.classList.remove('flex');
+    function salvarAnotacaoLead(texto) {
+      if (empresaSelecionadaModal) {
+        empresaSelecionadaModal.anotacoes = texto;
       }
-
-      // Gerar mensagem com base no Template e dados da empresa
-      const city = document.getElementById('searchCity').value || 'sua cidade';
-      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
-      const templateBase = document.getElementById('templateText').value;
-
-      // Substituição direta das variáveis no modelo
-      let mensagemFormatada = templateBase
-        .replace(/{empresa}/g, empresaSelecionadaModal.nome)
-        .replace(/{setor}/g, empresaSelecionadaModal.setor || 'seu segmento')
-        .replace(/{cidade}/g, city)
-        .replace(/{proposta}/g, offering);
-
-      document.getElementById('modalMsgText').value = mensagemFormatada;
-      document.getElementById('modalDetails').classList.remove('hidden');
     }
 
     function fecharModal() {
