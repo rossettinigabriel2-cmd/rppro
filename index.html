@@ -296,12 +296,23 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
         </div>
       </div>
 
-      <div class="flex justify-between items-center border-t border-slate-800 pt-4">
-        <a id="modalWhatsappBtn" href="#" target="_blank" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all items-center space-x-2">
-          <i class="fa-brands fa-whatsapp text-lg"></i>
-          <span>Abrir no WhatsApp</span>
-        </a>
-        <button onclick="fecharModal()" class="ml-auto bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-5 py-2.5 rounded-xl text-sm transition-all">
+<!-- BOTOES DE AÇÃO / ENCAMINHAMENTO -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800 pt-4">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <!-- Botão WhatsApp -->
+          <a id="modalWhatsappBtn" href="#" target="_blank" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+            <span>Enviar no WhatsApp</span>
+          </a>
+          
+          <!-- Botão E-mail -->
+          <a id="modalEmailBtn" href="#" target="_blank" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/20">
+            <i class="fa-regular fa-envelope text-lg"></i>
+            <span>Enviar E-mail</span>
+          </a>
+        </div>
+
+        <button onclick="fecharModal()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-5 py-2.5 rounded-xl text-sm transition-all">
           Fechar
         </button>
       </div>
@@ -562,6 +573,43 @@ Oferecemos {proposta}, o que pode otimizar a operação de vocês. Teria 5 minut
       } else {
         siteElem.innerText = 'Não informado';
       }
+
+      // 1. Gerar texto da mensagem baseada no template
+      const city = document.getElementById('searchCity').value || 'sua cidade';
+      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
+      const templateBase = document.getElementById('templateText').value;
+
+      let mensagemFormatada = templateBase
+        .replace(/{empresa}/g, empresaSelecionadaModal.nome)
+        .replace(/{setor}/g, empresaSelecionadaModal.setor || 'seu segmento')
+        .replace(/{cidade}/g, city)
+        .replace(/{proposta}/g, offering);
+
+      document.getElementById('modalMsgText').value = mensagemFormatada;
+
+      // 2. Configurar Link do WhatsApp (inclui texto da mensagem)
+      const waBtn = document.getElementById('modalWhatsappBtn');
+      const numClean = (empresaSelecionadaModal.whatsapp || telPrincipal).replace(/\D/g, '');
+      
+      if (numClean && numClean.length >= 8) {
+        const textEncoded = encodeURIComponent(mensagemFormatada);
+        waBtn.href = `https://wa.me/${numClean}?text=${textEncoded}`;
+      } else {
+        const textEncoded = encodeURIComponent(mensagemFormatada);
+        waBtn.href = `https://api.whatsapp.com/send?text=${textEncoded}`;
+      }
+
+      // 3. Configurar Link de E-mail (mailto)
+      const emailBtn = document.getElementById('modalEmailBtn');
+      const emailDestino = empresaSelecionadaModal.email || ''; 
+      const assunto = encodeURIComponent(`Oportunidade de Parceria com a ${empresaSelecionadaModal.nome}`);
+      const corpoEmail = encodeURIComponent(mensagemFormatada);
+
+      emailBtn.href = `mailto:${emailDestino}?subject=${assunto}&body=${corpoEmail}`;
+
+      // Exibe o modal
+      document.getElementById('modalDetails').classList.remove('hidden');
+    }
 
       // WhatsApp Btn
       const waBtn = document.getElementById('modalWhatsappBtn');
