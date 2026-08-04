@@ -352,24 +352,38 @@
     });
 
     // AUTENTICAÇÃO
-    function fazerLogin() {
+    // AUTENTICAÇÃO REAL COM FIREBASE
+    async function fazerLogin() {
       const email = document.getElementById('loginEmail').value;
       const senha = document.getElementById('loginSenha').value;
 
-      if (email === 'admin@rpprospect.com' && senha === '123456') {
+      try {
+        // Tenta autenticar no Firebase com o e-mail e senha informados
+        await window.signInWithEmailAndPassword(window.auth, email, senha);
+
+        // Se der certo, esconde a tela de login e exibe a aplicação
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('appContainer').classList.remove('hidden');
-      } else {
-        alert('Credenciais incorretas!');
+      } catch (error) {
+        // Se a senha estiver errada ou o usuário não existir, cai aqui
+        alert('Erro ao fazer login: ' + error.message);
       }
     }
 
-    function fazerLogout() {
-      buscaAtual = [];
-      document.getElementById('searchResultsTable').innerHTML = '';
-      document.getElementById('resultsWrapper').classList.add('hidden');
-      document.getElementById('appContainer').classList.add('hidden');
-      document.getElementById('loginSection').classList.remove('hidden');
+    async function fazerLogout() {
+      try {
+        // Encerra a sessão no Firebase
+        await window.signOut(window.auth);
+
+        // Limpa a busca e reseta a tela
+        buscaAtual = [];
+        document.getElementById('searchResultsTable').innerHTML = '';
+        document.getElementById('resultsWrapper').classList.add('hidden');
+        document.getElementById('appContainer').classList.add('hidden');
+        document.getElementById('loginSection').classList.remove('hidden');
+      } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+      }
     }
 
     // NAVEGAÇÃO
@@ -713,6 +727,100 @@
         copyTextSpan.innerText = "Copiar Mensagem";
       }, 2000);
     }
+    
   </script>
+        const siteElem = document.getElementById('modalWebsite');
+      if (empresaSelecionadaModal.site && empresaSelecionadaModal.site !== '#') {
+        siteElem.innerHTML = `<a href="${empresaSelecionadaModal.site}" target="_blank" class="hover:underline flex items-center space-x-1"><i class="fa-solid fa-globe text-xs mr-1"></i>${empresaSelecionadaModal.site}</a>`;
+      } else {
+        siteElem.innerText = 'Não informado';
+      }
+
+      // Preenchimento da Mensagem
+      const city = document.getElementById('searchCity').value || 'sua cidade';
+      const offering = document.getElementById('searchOffering').value || 'nossos serviços';
+      const templateBase = templates[templateChaveAtual];
+
+      let mensagemFormatada = templateBase
+        .replace(/{empresa}/g, empresaSelecionadaModal.nome)
+        .replace(/{setor}/g, empresaSelecionadaModal.setor || 'seu segmento')
+        .replace(/{cidade}/g, city)
+        .replace(/{proposta}/g, offering);
+
+      document.getElementById('modalMsgText').value = mensagemFormatada;
+
+      // Link do WhatsApp
+      const waBtn = document.getElementById('modalWhatsappBtn');
+      const numClean = (empresaSelecionadaModal.whatsapp || telPrincipal).replace(/\D/g, '');
+      const textEncoded = encodeURIComponent(mensagemFormatada);
+      
+      if (numClean && numClean.length >= 8) {
+        waBtn.href = `https://wa.me/${numClean}?text=${textEncoded}`;
+      } else {
+        waBtn.href = `https://api.whatsapp.com/send?text=${textEncoded}`;
+      }
+
+      // Link do E-mail (mailto)
+      const emailBtn = document.getElementById('modalEmailBtn');
+      const emailDestino = empresaSelecionadaModal.email || ''; 
+      const assunto = encodeURIComponent(`Oportunidade de Parceria com a ${empresaSelecionadaModal.nome}`);
+      const corpoEmail = encodeURIComponent(mensagemFormatada);
+
+      emailBtn.href = `mailto:${emailDestino}?subject=${assunto}&body=${corpoEmail}`;
+
+      document.getElementById('modalDetails').classList.remove('hidden');
+    }
+
+    function salvarAnotacaoLead(texto) {
+      if (empresaSelecionadaModal) {
+        empresaSelecionadaModal.anotacoes = texto;
+      }
+    }
+
+    function fecharModal() {
+      document.getElementById('modalDetails').classList.add('hidden');
+      document.getElementById('copyMsgText').innerText = "Copiar Mensagem";
+    }
+
+    function copiarMensagem() {
+      const txt = document.getElementById('modalMsgText');
+      txt.select();
+      navigator.clipboard.writeText(txt.value);
+      
+      const copyTextSpan = document.getElementById('copyMsgText');
+      copyTextSpan.innerText = "Copiado!";
+      setTimeout(() => {
+        copyTextSpan.innerText = "Copiar Mensagem";
+      }, 2000);
+    }
+    <!-- SDKs do Firebase (via CDN para funcionar direto no navegador) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Suas credenciais reais do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBYlR6csHhWNoJKpFTD0d8ZArEiTwH3G8s",
+    authDomain: "rppro-23053.firebaseapp.com",
+    projectId: "rppro-23053",
+    storageBucket: "rppro-23053.firebasestorage.app",
+    messagingSenderId: "904343446960",
+    appId: "1:904343446960:web:657ff014ddb9c8a49c6275",
+    measurementId: "G-F5PNLMFF2W"
+  };
+
+  // Inicializa o Firebase
+  const app = initializeApp(firebaseConfig);
+  
+  // Disponibiliza as ferramentas globalmente para o restante do seu código usar
+  window.auth = getAuth(app);
+  window.db = getFirestore(app);
+  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window.signOut = signOut;
+</script>
+  </script>
+</body>
+</html>
 </body>
 </html>
