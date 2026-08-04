@@ -728,8 +728,7 @@
       }, 2000);
     }
     
-  </script>
-        const siteElem = document.getElementById('modalWebsite');
+const siteElem = document.getElementById('modalWebsite');
       if (empresaSelecionadaModal.site && empresaSelecionadaModal.site !== '#') {
         siteElem.innerHTML = `<a href="${empresaSelecionadaModal.site}" target="_blank" class="hover:underline flex items-center space-x-1"><i class="fa-solid fa-globe text-xs mr-1"></i>${empresaSelecionadaModal.site}</a>`;
       } else {
@@ -793,32 +792,33 @@
         copyTextSpan.innerText = "Copiar Mensagem";
       }, 2000);
     }
-    <!-- SDKs do Firebase (via CDN para funcionar direto no navegador) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  </script>
 
-  // Suas credenciais reais do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyBYlR6csHhWNoJKpFTD0d8ZArEiTwH3G8s",
-    authDomain: "rppro-23053.firebaseapp.com",
-    projectId: "rppro-23053",
-    storageBucket: "rppro-23053.firebasestorage.app",
-    messagingSenderId: "904343446960",
-    appId: "1:904343446960:web:657ff014ddb9c8a49c6275",
-    measurementId: "G-F5PNLMFF2W"
-  };
+  <!-- SDKs do Firebase (via CDN para funcionar direto no navegador) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Inicializa o Firebase
-  const app = initializeApp(firebaseConfig);
-  
-  // Disponibiliza as ferramentas globalmente para o restante do seu código usar
-  window.auth = getAuth(app);
-  window.db = getFirestore(app);
-  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-  window.signOut = signOut;
-</script>
+    // Suas credenciais reais do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBYlR6csHhWNoJKpFTD0d8ZArEiTwH3G8s",
+      authDomain: "rppro-23053.firebaseapp.com",
+      projectId: "rppro-23053",
+      storageBucket: "rppro-23053.firebasestorage.app",
+      messagingSenderId: "904343446960",
+      appId: "1:904343446960:web:657ff014ddb9c8a49c6275",
+      measurementId: "G-F5PNLMFF2W"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    
+    // Disponibiliza as ferramentas globalmente
+    window.auth = getAuth(app);
+    window.db = getFirestore(app);
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
   </script>
 </body>
 </html>
